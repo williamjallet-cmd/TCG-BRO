@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>TCG – La bande</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+    }
+    .app {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      background: radial-gradient(circle at top, #111827, #020617);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .card-image {
+      border-radius: 10px;
+      background: #020617;
+      aspect-ratio: 3 / 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .card-name-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .card-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .card-desc {
+      font-size: 0.8rem;
+      color: #d1d5db;
+      min-height: 2.4em;
+    }
+    .card-owner {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      font-style: italic;
+    }
+    .card-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+    .badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: #4f46e5;
+      color: white;
+    }
+    button.secondary {
+      background: #111827;
+      border: 1px solid #374151;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    .status {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+      margin-top: 8px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      background: #020617;
+    }
+    form .full {
+      grid-column: 1 / -1;
+    }
+    label {
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    input, textarea {
+      border-radius: 8px;
+      border: 1px solid #374151;
+      padding: 6px 8px;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.85rem;
+      resize: vertical;
+    }
+    input:focus, textarea:focus {
+      outline: 1px solid #4f46e5;
+      border-color: #4f46e5;
+    }
+    .error {
+      color: #f97373;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+    .auth-box {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .auth-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .auth-row label {
+      flex: 1;
+      margin: 0;
+    }
+    .pill {
+      border-radius: 999px;
+      border: 1px solid #374151;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+    .pack-box {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .pack-results {
+      margin-top: 8px;
+    }
+    .pack-timer {
+      font-size: 0.85rem;
+      color: #9ca3af;
+    }
+    @media (max-width: 640px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+      .auth-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>TCG – La bande</h1>
+    <p class="subtitle">
+      Petites cartes avec la tête de tes potes 😎 – avec pseudo + packs à ouvrir toutes les X heures.
+    </p>
+
+    <!-- SECTION CONNEXION -->
+    <div class="auth-box">
+      <div class="section-title">👤 Connexion</div>
+      <div id="auth-logged" style="display:none;">
+        <div class="auth-row">
+          <span class="pill">
+            Connecté en tant que <strong id="current-player-label"></strong>
+          </span>
+          <button id="logout-btn" class="secondary">Changer de pseudo</button>
+        </div>
+      </div>
+
+      <form id="auth-form">
+        <div class="auth-row">
+          <label>
+            Ton pseudo
+            <input type="text" id="player_name" required placeholder="Ex: William" />
+          </label>
+          <button type="submit">Se connecter</button>
+        </div>
+      </form>
+      <p class="status">
+        Le pseudo est seulement enregistré dans ton navigateur, pas de mot de passe, pas d'email 🙂
+      </p>
+    </div>
+
+    <!-- SECTION PACK -->
+    <div class="pack-box">
+      <div class="section-title">🎁 Ouvrir un pack</div>
+      <p class="pack-timer" id="pack-timer-text">
+        Connecte-toi avec un pseudo, puis ouvre un pack !
+      </p>
+      <button id="open-pack-btn">Ouvrir un pack</button>
+      <div class="pack-results">
+        <div class="section-title" style="margin-top: 8px; margin-bottom:4px;font-size:1rem;">
+          Résultat du dernier pack
+        </div>
+        <div id="pack-cards" class="cards-grid"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">📦 Cartes existantes</div>
+      <div class="toolbar">
+        <button id="reload-btn" class="secondary">Recharger les cartes</button>
+        <label class="pill">
+          <input type="checkbox" id="filter-mine" style="margin-right:6px;" />
+          Afficher seulement mes cartes
+        </label>
+        <span id="status" class="status"></span>
+      </div>
+      <div id="cards" class="cards-grid"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">➕ Ajouter une carte</div>
+      <form id="card-form">
+        <label class="full">
+          Nom de la carte (pseudo de ton pote)
+          <input type="text" id="name" required placeholder="Ex: Thomas le Tank" />
+        </label>
+
+        <label class="full">
+          Image depuis ton ordinateur (recommandé)
+          <input type="file" id="image_file" accept="image/*" />
+        </label>
+
+        <label class="full">
+          OU URL de l'image (facultatif si tu as uploadé un fichier)
+          <input type="url" id="image_url" placeholder="https://..." />
+        </label>
+
+        <label class="full">
+          Description
+          <textarea id="description" rows="2" placeholder="Ex: Boit 4 bières d'un coup et reste debout."></textarea>
+        </label>
+
+        <label>
+          Attaque
+          <input type="number" id="attack" value="5" />
+        </label>
+        <label>
+          Défense
+          <input type="number" id="defense" value="5" />
+        </label>
+        <div class="full">
+          <button type="submit">Créer la carte</button>
+          <div id="form-error" class="error"></div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+    // ⬇⬇⬇ IMPORTANT : tes valeurs Supabase ⬇⬇⬇
+    const SUPABASE_URL = "https://mmqxwuavksjnrdzwqogu.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_kISGOVkkUrKT8P_GfSKnOQ_NpMjQs15";
+    // ⬆⬆⬆ IMPORTANT : tes valeurs Supabase ⬆⬆⬆
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const cardsContainer = document.getElementById("cards");
+    const statusEl = document.getElementById("status");
+    const reloadBtn = document.getElementById("reload-btn");
+    const form = document.getElementById("card-form");
+    const formError = document.getElementById("form-error");
+    const filterMineCheckbox = document.getElementById("filter-mine");
+
+    const authForm = document.getElementById("auth-form");
+    const authLoggedBox = document.getElementById("auth-logged");
+    const currentPlayerLabel = document.getElementById("current-player-label");
+    const logoutBtn = document.getElementById("logout-btn");
+
+    const packTimerText = document.getElementById("pack-timer-text");
+    const openPackBtn = document.getElementById("open-pack-btn");
+    const packCardsContainer = document.getElementById("pack-cards");
+
+    // Config cooldown pack
+    const PACK_COOLDOWN_HOURS = 3;
+    const CARDS_PER_PACK = 3;
+
+    let currentPlayer = null;
+    let lastLoadedCards = [];
+
+    function setStatus(message) {
+      statusEl.textContent = message || "";
+    }
+
+    function loadPlayerFromStorage() {
+      const stored = localStorage.getItem("tcg_player_name");
+      if (stored && stored.trim() !== "") {
+        currentPlayer = stored;
+      } else {
+        currentPlayer = null;
+      }
+      updateAuthUI();
+      updatePackTimer();
+    }
+
+    function updateAuthUI() {
+      if (currentPlayer) {
+        authLoggedBox.style.display = "block";
+        authForm.style.display = "none";
+        currentPlayerLabel.textContent = currentPlayer;
+      } else {
+        authLoggedBox.style.display = "none";
+        authForm.style.display = "block";
+      }
+    }
+
+    function getPackKeyForPlayer(playerName) {
+      return "tcg_next_pack_" + playerName;
+    }
+
+    function getNextPackTime() {
+      if (!currentPlayer) return null;
+      const key = getPackKeyForPlayer(currentPlayer);
+      const stored = localStorage.getItem(key);
+      if (!stored) return null;
+      return new Date(stored);
+    }
+
+    function setNextPackTime(hours) {
+      if (!currentPlayer) return;
+      const key = getPackKeyForPlayer(currentPlayer);
+      const now = new Date();
+      const next = new Date(now.getTime() + hours * 60 * 60 * 1000);
+      localStorage.setItem(key, next.toISOString());
+    }
+
+    function msUntilNextPack() {
+      const next = getNextPackTime();
+      if (!next) return 0;
+      const now = new Date();
+      return Math.max(0, next.getTime() - now.getTime());
+    }
+
+    function canOpenPack() {
+      return msUntilNextPack() === 0;
+    }
+
+    function formatDuration(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+      if (h <= 0 && m <= 0 && s <= 0) return "Pack disponible ✅";
+      return `${h}h ${m}m ${s}s`;
+    }
+
+    function updatePackTimer() {
+      if (!currentPlayer) {
+        packTimerText.textContent = "Connecte-toi avec un pseudo, puis ouvre un pack !";
+        openPackBtn.disabled = true;
+        return;
+      }
+      const msLeft = msUntilNextPack();
+      if (msLeft <= 0) {
+        packTimerText.textContent = "Pack disponible ✅";
+        openPackBtn.disabled = false;
+      } else {
+        packTimerText.textContent = "Prochain pack dans " + formatDuration(msLeft);
+        openPackBtn.disabled = true;
+      }
+    }
+
+    function createCardElement(card) {
+      const div = document.createElement("div");
+      div.className = "card";
+
+      const imageDiv = document.createElement("div");
+      imageDiv.className = "card-image";
+
+      if (card.image_url) {
+        const img = document.createElement("img");
+        img.src = card.image_url;
+        img.alt = card.name;
+        imageDiv.appendChild(img);
+      } else {
+        imageDiv.textContent = "Pas d'image";
+      }
+
+      const nameRow = document.createElement("div");
+      nameRow.className = "card-name-row";
+
+      const nameEl = document.createElement("div");
+      nameEl.className = "card-name";
+      nameEl.textContent = card.name;
+
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = "Pote";
+
+      nameRow.appendChild(nameEl);
+      nameRow.appendChild(badge);
+
+      const desc = document.createElement("div");
+      desc.className = "card-desc";
+      desc.textContent = card.description || "Aucune description.";
+
+      const owner = document.createElement("div");
+      owner.className = "card-owner";
+      if (card.owner_name) {
+        owner.textContent = `Propriétaire : ${card.owner_name}`;
+      } else {
+        owner.textContent = "Propriétaire : (inconnu)";
+      }
+
+      const stats = document.createElement("div");
+      stats.className = "card-stats";
+      stats.innerHTML = `<span>ATK: ${card.attack ?? 0}</span><span>DEF: ${card.defense ?? 0}</span>`;
+
+      div.appendChild(imageDiv);
+      div.appendChild(nameRow);
+      div.appendChild(desc);
+      div.appendChild(owner);
+      div.appendChild(stats);
+      return div;
+    }
+
+    function renderCards() {
+      cardsContainer.innerHTML = "";
+      let cardsToShow = lastLoadedCards;
+      if (filterMineCheckbox.checked && currentPlayer) {
+        cardsToShow = cardsToShow.filter(c => c.owner_name === currentPlayer);
+      }
+      if (!cardsToShow.length) {
+        setStatus("Aucune carte à afficher (essaye d'en ajouter ou de décocher le filtre).");
+        return;
+      }
+      setStatus(`Cartes affichées : ${cardsToShow.length}`);
+      cardsToShow.forEach(card => {
+        const el = createCardElement(card);
+        cardsContainer.appendChild(el);
+      });
+    }
+
+    async function loadCards() {
+      setStatus("Chargement...");
+      cardsContainer.innerHTML = "";
+      try {
+        const { data, error } = await supabase
+          .from("cards")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error(error);
+          setStatus("Erreur lors du chargement des cartes.");
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          lastLoadedCards = [];
+          setStatus("Aucune carte pour l’instant. Ajoute-en une en bas 👇");
+          return;
+        }
+
+        lastLoadedCards = data;
+        renderCards();
+      } catch (e) {
+        console.error(e);
+        setStatus("Erreur inconnue.");
+      }
+    }
+
+    async function handleAddCard(event) {
+      event.preventDefault();
+      formError.textContent = "";
+
+      if (!currentPlayer) {
+        formError.textContent = "Connecte-toi d'abord avec un pseudo en haut 🙂";
+        return;
+      }
+
+      const name = document.getElementById("name").value.trim();
+      const imageUrlField = document.getElementById("image_url").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const attack = parseInt(document.getElementById("attack").value || "0", 10);
+      const defense = parseInt(document.getElementById("defense").value || "0", 10);
+      const fileInput = document.getElementById("image_file");
+      const file = fileInput.files[0];
+
+      if (!name) {
+        formError.textContent = "Le nom est obligatoire.";
+        return;
+      }
+
+      let finalImageUrl = imageUrlField || null;
+
+      // Upload fichier si choisi
+      if (file) {
+        try {
+          const ext = file.name.split(".").pop();
+          const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+          const filePath = `cards/${fileName}`;
+
+          const { error: uploadError } = await supabase
+            .storage
+            .from("card-images")
+            .upload(filePath, file);
+
+          if (uploadError) {
+            console.error(uploadError);
+            formError.textContent = "Erreur upload : " + uploadError.message;
+            return;
+          }
+
+          const { data: publicData } = supabase
+            .storage
+            .from("card-images")
+            .getPublicUrl(filePath);
+
+          finalImageUrl = publicData.publicUrl;
+        } catch (e) {
+          console.error(e);
+          formError.textContent = "Erreur inconnue pendant l'upload.";
+          return;
+        }
+      }
+
+      try {
+        const { error } = await supabase.from("cards").insert({
+          name,
+          image_url: finalImageUrl,
+          description: description || null,
+          attack,
+          defense,
+          owner_name: currentPlayer
+        });
+
+        if (error) {
+          console.error(error);
+          formError.textContent = "Erreur création carte : " + error.message;
+          return;
+        }
+
+        form.reset();
+        document.getElementById("attack").value = "5";
+        document.getElementById("defense").value = "5";
+        await loadCards();
+      } catch (e) {
+        console.error(e);
+        formError.textContent = "Erreur inconnue.";
+      }
+    }
+
+    async function handleOpenPack() {
+      if (!currentPlayer) {
+        alert("Connecte-toi d'abord avec un pseudo en haut 🙂");
+        return;
+      }
+
+      const msLeft = msUntilNextPack();
+      if (msLeft > 0) {
+        alert("Tu dois encore attendre " + formatDuration(msLeft) + " avant d'ouvrir un nouveau pack.");
+        return;
+      }
+
+      // S'assurer qu'on a des cartes chargées
+      if (!lastLoadedCards || lastLoadedCards.length === 0) {
+        await loadCards();
+      }
+      if (!lastLoadedCards || lastLoadedCards.length === 0) {
+        alert("Il n'y a aucune carte dans la base pour le moment.");
+        return;
+      }
+
+      // Tirer CARDS_PER_PACK cartes au hasard (avec répétitions possibles)
+      const drawn = [];
+      for (let i = 0; i < CARDS_PER_PACK; i++) {
+        const idx = Math.floor(Math.random() * lastLoadedCards.length);
+        drawn.push(lastLoadedCards[idx]);
+      }
+
+      // Afficher le résultat dans la zone pack-cards
+      packCardsContainer.innerHTML = "";
+      drawn.forEach(card => {
+        const el = createCardElement(card);
+        packCardsContainer.appendChild(el);
+      });
+
+      // Fixer le prochain pack
+      setNextPackTime(PACK_COOLDOWN_HOURS);
+      updatePackTimer();
+    }
+
+    // Gestion "login" par pseudo
+    authForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const input = document.getElementById("player_name");
+      const value = input.value.trim();
+      if (!value) return;
+      currentPlayer = value;
+      localStorage.setItem("tcg_player_name", currentPlayer);
+      updateAuthUI();
+      updatePackTimer();
+      loadCards();
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("tcg_player_name");
+      currentPlayer = null;
+      updateAuthUI();
+      updatePackTimer();
+      loadCards();
+    });
+
+    filterMineCheckbox.addEventListener("change", () => {
+      renderCards();
+    });
+
+    reloadBtn.addEventListener("click", loadCards);
+    form.addEventListener("submit", handleAddCard);
+    openPackBtn.addEventListener("click", handleOpenPack);
+
+    // Timer du pack mis à jour régulièrement
+    setInterval(updatePackTimer, 1000);
+
+    // Initialisation
+    loadPlayerFromStorage();
+    loadCards();
+  </script>
+</body>
+</html>
