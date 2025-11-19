@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>TCG – La bande</title>
+  <title>Brokemon</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -20,12 +20,15 @@
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at top, #111827, #020617 45%, #000 80%);
+      background:
+        radial-gradient(circle at top, #111827, #020617 45%, #000 80%),
+        radial-gradient(circle at bottom left, rgba(59,130,246,0.12), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(244,114,182,0.12), transparent 60%);
       color: var(--text);
       min-height: 100vh;
     }
     .app {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 16px;
     }
@@ -37,25 +40,28 @@
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 16px;
-      padding: 12px 16px;
-      border-radius: 16px;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(17, 24, 39, 0.95));
-      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(10px);
+      padding: 14px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background:
+        linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(17, 24, 39, 0.98));
+      box-shadow: 0 24px 45px rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
     }
     .header-left {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     .logo-orb {
-      width: 40px;
-      height: 40px;
+      width: 46px;
+      height: 46px;
       border-radius: 999px;
-      background: conic-gradient(from 180deg, #f97316, #4f46e5, #22c55e, #f97316);
+      background: conic-gradient(from 180deg, #f97316, #4f46e5, #22c55e, #ec4899, #f97316);
       padding: 2px;
-      box-shadow: 0 0 20px rgba(129, 140, 248, 0.9);
+      box-shadow:
+        0 0 22px rgba(129, 140, 248, 0.7),
+        0 0 38px rgba(59,130,246,0.5);
     }
     .logo-orb-inner {
       width: 100%;
@@ -66,13 +72,13 @@
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 0.9rem;
       letter-spacing: 0.12em;
       color: #e5e7eb;
     }
     h1 {
-      font-size: 1.6rem;
-      margin: 0;
+      font-size: 1.7rem;
+      margin: 0 0 2px;
     }
     .subtitle {
       font-size: 0.85rem;
@@ -89,59 +95,110 @@
       font-size: 0.7rem;
       padding: 3px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
+      border: 1px solid rgba(148, 163, 184, 0.5);
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.12em;
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    /* LAYOUT */
+    .layout-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 2fr);
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
     .section-title {
-      margin-top: 24px;
+      margin-top: 4px;
       margin-bottom: 8px;
       font-size: 1.05rem;
       font-weight: 600;
       letter-spacing: 0.03em;
     }
     .panel {
-      margin-bottom: 18px;
       padding: 12px;
-      border-radius: 16px;
+      border-radius: 18px;
       border: 1px solid var(--border);
-      background: radial-gradient(circle at top left, #111827, #020617 55%);
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.75);
+      background:
+        radial-gradient(circle at top left, #111827, #020617 55%);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.82);
     }
+
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
     }
 
+    /* CARDS */
     .card {
       position: relative;
-      border-radius: 14px;
+      border-radius: 15px;
       border: 1px solid #111827;
-      background: radial-gradient(circle at top, #111827, #020617);
+      background:
+        radial-gradient(circle at top, #111827, #020617);
       padding: 8px;
       display: flex;
       flex-direction: column;
       gap: 6px;
-      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.7);
+      box-shadow: 0 12px 20px rgba(15, 23, 42, 0.9);
       overflow: hidden;
-      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(148,163,184,0.15), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      pointer-events: none;
+    }
+    .card:hover::before {
+      opacity: 1;
     }
     .card:hover {
       transform: translateY(-2px) scale(1.01);
-      box-shadow: 0 16px 28px rgba(15, 23, 42, 0.9);
-      border-color: #4f46e5;
+      background: radial-gradient(circle at top, #020617, #020617);
     }
+
+    /* Glow par rareté */
+    .card.rarity-common:hover {
+      border-color: #6b7280;
+      box-shadow: 0 18px 30px rgba(148,163,184,0.6);
+    }
+    .card.rarity-uncommon:hover {
+      border-color: #22c55e;
+      box-shadow: 0 18px 30px rgba(34,197,94,0.6);
+    }
+    .card.rarity-rare:hover {
+      border-color: #ec4899;
+      box-shadow: 0 18px 30px rgba(236,72,153,0.7);
+    }
+    .card.rarity-legendary:hover {
+      border-color: #fbbf24;
+      box-shadow:
+        0 0 18px rgba(250,204,21,0.9),
+        0 18px 32px rgba(250,204,21,0.7);
+    }
+
     .card-image {
-      border-radius: 10px;
+      border-radius: 11px;
       background: #020617;
       aspect-ratio: 3 / 4;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      border: 1px solid #1f2937;
     }
     .card-image img {
       width: 100%;
@@ -226,15 +283,15 @@
       background: radial-gradient(circle at top, rgba(34, 197, 94, 0.4), #020617);
     }
     .badge.rarity-rare {
-      border-color: #3b82f6;
-      color: #bfdbfe;
-      background: radial-gradient(circle at top, rgba(59, 130, 246, 0.35), #020617);
+      border-color: #ec4899;
+      color: #f9a8d4;
+      background: radial-gradient(circle at top, rgba(236, 72, 153, 0.4), #020617);
     }
     .badge.rarity-legendary {
       border-color: #fbbf24;
       color: #fef3c7;
-      background: radial-gradient(circle at top, rgba(251, 191, 36, 0.6), #020617);
-      box-shadow: 0 0 12px rgba(250, 204, 21, 0.65);
+      background: radial-gradient(circle at top, rgba(251, 191, 36, 0.65), #020617);
+      box-shadow: 0 0 14px rgba(250, 204, 21, 0.8);
     }
 
     .toolbar {
@@ -320,12 +377,10 @@
     }
 
     .auth-box, .pack-box, .collection-box {
-      padding: 12px;
-      border-radius: 16px;
+      border-radius: 18px;
       border: 1px solid var(--border);
       background: radial-gradient(circle at top left, #020617, #020617 55%);
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.75);
-      margin-bottom: 18px;
     }
     .auth-row {
       display: flex;
@@ -343,6 +398,7 @@
       padding: 4px 10px;
       font-size: 0.8rem;
       color: #9ca3af;
+      background: radial-gradient(circle at top left, #020617, #020617);
     }
     .pack-timer {
       font-size: 0.85rem;
@@ -368,6 +424,125 @@
       border: 1px solid #92400e;
     }
 
+    /* PACK ANIMATION OVERLAY */
+    .pack-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(15,23,42,0.9), rgba(0,0,0,0.96));
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .pack-overlay.visible {
+      display: flex;
+    }
+    .pack-box-anim {
+      width: 220px;
+      height: 260px;
+      border-radius: 24px;
+      background: linear-gradient(145deg, #0f172a, #111827);
+      border: 2px solid #4f46e5;
+      box-shadow:
+        0 0 24px rgba(129,140,248,0.8),
+        0 0 40px rgba(56,189,248,0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      animation: packPulse 0.9s ease-in-out infinite alternate;
+    }
+    .pack-streak {
+      position: absolute;
+      width: 160%;
+      height: 60%;
+      background: radial-gradient(circle at 10% 0%, rgba(251,191,36,0.8), transparent 55%);
+      top: -20%;
+      left: -30%;
+      opacity: 0.6;
+      transform: rotate(20deg);
+    }
+    .pack-icon {
+      width: 70px;
+      height: 90px;
+      border-radius: 16px;
+      background: conic-gradient(from 220deg, #f97316, #4f46e5, #22c55e, #f97316);
+      padding: 3px;
+      box-shadow:
+        0 0 18px rgba(250, 204, 21, 0.8),
+        0 0 26px rgba(129,140,248,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pack-icon-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      background: radial-gradient(circle at top, #111827, #020617);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .pack-icon-inner span {
+      font-size: 0.65rem;
+      opacity: 0.8;
+    }
+    .pack-text-main {
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    .pack-text-sub {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      text-align: center;
+    }
+
+    .card-reveal {
+      animation: cardReveal 0.3s ease-out;
+    }
+
+    @keyframes cardReveal {
+      0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.96);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes packPulse {
+      0% {
+        transform: translateY(0) scale(1);
+        box-shadow:
+          0 0 16px rgba(129,140,248,0.85),
+          0 0 30px rgba(56,189,248,0.45);
+      }
+      100% {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow:
+          0 0 24px rgba(250,204,21,0.9),
+          0 0 40px rgba(59,130,246,0.6);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .layout-main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
     @media (max-width: 640px) {
       .header {
         flex-direction: column;
@@ -387,15 +562,30 @@
   </style>
 </head>
 <body>
+  <!-- OVERLAY ANIMATION PACK -->
+  <div id="pack-overlay" class="pack-overlay">
+    <div class="pack-box-anim">
+      <div class="pack-streak"></div>
+      <div class="pack-icon">
+        <div class="pack-icon-inner">
+          PACK
+          <span>BROKEMON</span>
+        </div>
+      </div>
+      <div class="pack-text-main">Ouverture du pack...</div>
+      <div class="pack-text-sub">Prépare-toi à découvrir tes cartes ✨</div>
+    </div>
+  </div>
+
   <div class="app">
     <!-- HEADER -->
     <header class="header">
       <div class="header-left">
         <div class="logo-orb">
-          <div class="logo-orb-inner">TCG</div>
+          <div class="logo-orb-inner">BRO</div>
         </div>
         <div>
-          <h1>TCG – La bande</h1>
+          <h1>Brokemon</h1>
           <p class="subtitle">
             Packs, raretés, collection & gestion des cartes entre potes 😎
           </p>
@@ -407,123 +597,131 @@
       </div>
     </header>
 
-    <!-- CONNEXION -->
-    <section class="auth-box panel">
-      <div class="section-title">👤 Connexion</div>
-      <div id="auth-logged" style="display:none;">
-        <div class="auth-row">
-          <span class="pill">
-            Connecté en tant que <strong id="current-player-label"></strong>
-          </span>
-          <button id="logout-btn" class="secondary">Changer de pseudo</button>
-        </div>
+    <div class="layout-main">
+      <!-- COLONNE GAUCHE : Connexion + Pack + Collection -->
+      <div class="column">
+        <!-- CONNEXION -->
+        <section class="auth-box panel">
+          <div class="section-title">👤 Connexion</div>
+          <div id="auth-logged" style="display:none;">
+            <div class="auth-row">
+              <span class="pill">
+                Connecté en tant que <strong id="current-player-label"></strong>
+              </span>
+              <button id="logout-btn" class="secondary">Changer de pseudo</button>
+            </div>
+          </div>
+
+          <form id="auth-form">
+            <div class="auth-row">
+              <label>
+                Ton pseudo
+                <input type="text" id="player_name" required placeholder="Ex: William" />
+              </label>
+              <button type="submit">Se connecter</button>
+            </div>
+          </form>
+          <p class="status">
+            Le pseudo est seulement enregistré dans ton navigateur, pas de mot de passe, pas d'email 🙂
+          </p>
+        </section>
+
+        <!-- PACKS -->
+        <section class="pack-box panel">
+          <div class="section-title">🎁 Ouvrir un pack</div>
+          <p class="pack-timer" id="pack-timer-text">
+            Connecte-toi avec un pseudo, puis ouvre un pack !
+          </p>
+          <button id="open-pack-btn">✨ Ouvrir un pack</button>
+          <div class="pack-results">
+            <div class="section-title" style="margin-top: 8px; margin-bottom:4px;font-size:1rem;">
+              Résultat du dernier pack
+            </div>
+            <div id="pack-cards" class="cards-grid"></div>
+          </div>
+        </section>
+
+        <!-- COLLECTION -->
+        <section class="collection-box panel">
+          <div class="collection-header">
+            <div class="section-title">📚 Ma collection</div>
+            <div class="pill" id="collection-summary"></div>
+          </div>
+          <button id="reload-collection-btn" class="secondary" style="margin-bottom:8px;">
+            Recharger ma collection
+          </button>
+          <div id="collection-cards" class="cards-grid"></div>
+          <p id="collection-empty-text" class="status"></p>
+        </section>
       </div>
 
-      <form id="auth-form">
-        <div class="auth-row">
-          <label>
-            Ton pseudo
-            <input type="text" id="player_name" required placeholder="Ex: William" />
-          </label>
-          <button type="submit">Se connecter</button>
-        </div>
-      </form>
-      <p class="status">
-        Le pseudo est seulement enregistré dans ton navigateur, pas de mot de passe, pas d'email 🙂
-      </p>
-    </section>
+      <!-- COLONNE DROITE : Toutes les cartes + ajout -->
+      <div class="column">
+        <!-- TOUTES LES CARTES -->
+        <section class="panel">
+          <div class="section-title">📦 Toutes les cartes du jeu</div>
+          <div class="toolbar">
+            <button id="reload-btn" class="secondary">Recharger les cartes</button>
+            <label class="pill">
+              <input type="checkbox" id="filter-mine" style="margin-right:6px;" />
+              Afficher seulement mes cartes créées
+            </label>
+            <span id="status" class="status"></span>
+          </div>
+          <div id="cards" class="cards-grid"></div>
+        </section>
 
-    <!-- PACKS -->
-    <section class="pack-box panel">
-      <div class="section-title">🎁 Ouvrir un pack</div>
-      <p class="pack-timer" id="pack-timer-text">
-        Connecte-toi avec un pseudo, puis ouvre un pack !
-      </p>
-      <button id="open-pack-btn">✨ Ouvrir un pack</button>
-      <div class="pack-results">
-        <div class="section-title" style="margin-top: 8px; margin-bottom:4px;font-size:1rem;">
-          Résultat du dernier pack
-        </div>
-        <div id="pack-cards" class="cards-grid"></div>
+        <!-- AJOUT CARTE (ADMIN SEULEMENT) -->
+        <section id="create-section" class="panel" style="display:none;">
+          <div class="section-title">➕ Ajouter une carte</div>
+          <form id="card-form">
+            <label class="full">
+              Nom de la carte (pseudo de ton pote)
+              <input type="text" id="name" required placeholder="Ex: Thomas le Tank" />
+            </label>
+
+            <label class="full">
+              Image depuis ton ordinateur (recommandé)
+              <input type="file" id="image_file" accept="image/*" />
+            </label>
+
+            <label class="full">
+              OU URL de l'image (facultatif si tu as uploadé un fichier)
+              <input type="url" id="image_url" placeholder="https://..." />
+            </label>
+
+            <label class="full">
+              Description
+              <textarea id="description" rows="2" placeholder="Ex: Boit 4 bières d'un coup et reste debout."></textarea>
+            </label>
+
+            <label>
+              Attaque
+              <input type="number" id="attack" value="5" />
+            </label>
+            <label>
+              Défense
+              <input type="number" id="defense" value="5" />
+            </label>
+
+            <label>
+              Rareté
+              <select id="rarity">
+                <option value="common">Commun</option>
+                <option value="uncommon">Peu commun</option>
+                <option value="rare">Rare</option>
+                <option value="legendary">Légendaire</option>
+              </select>
+            </label>
+
+            <div class="full">
+              <button type="submit">Créer la carte</button>
+              <div id="form-error" class="error"></div>
+            </div>
+          </form>
+        </section>
       </div>
-    </section>
-
-    <!-- COLLECTION -->
-    <section class="collection-box panel">
-      <div class="collection-header">
-        <div class="section-title">📚 Ma collection</div>
-        <div class="pill" id="collection-summary"></div>
-      </div>
-      <button id="reload-collection-btn" class="secondary" style="margin-bottom:8px;">
-        Recharger ma collection
-      </button>
-      <div id="collection-cards" class="cards-grid"></div>
-      <p id="collection-empty-text" class="status"></p>
-    </section>
-
-    <!-- TOUTES LES CARTES -->
-    <section class="panel">
-      <div class="section-title">📦 Toutes les cartes du jeu</div>
-      <div class="toolbar">
-        <button id="reload-btn" class="secondary">Recharger les cartes</button>
-        <label class="pill">
-          <input type="checkbox" id="filter-mine" style="margin-right:6px;" />
-          Afficher seulement mes cartes créées
-        </label>
-        <span id="status" class="status"></span>
-      </div>
-      <div id="cards" class="cards-grid"></div>
-    </section>
-
-    <!-- AJOUT CARTE -->
-    <section class="panel">
-      <div class="section-title">➕ Ajouter une carte</div>
-      <form id="card-form">
-        <label class="full">
-          Nom de la carte (pseudo de ton pote)
-          <input type="text" id="name" required placeholder="Ex: Thomas le Tank" />
-        </label>
-
-        <label class="full">
-          Image depuis ton ordinateur (recommandé)
-          <input type="file" id="image_file" accept="image/*" />
-        </label>
-
-        <label class="full">
-          OU URL de l'image (facultatif si tu as uploadé un fichier)
-          <input type="url" id="image_url" placeholder="https://..." />
-        </label>
-
-        <label class="full">
-          Description
-          <textarea id="description" rows="2" placeholder="Ex: Boit 4 bières d'un coup et reste debout."></textarea>
-        </label>
-
-        <label>
-          Attaque
-          <input type="number" id="attack" value="5" />
-        </label>
-        <label>
-          Défense
-          <input type="number" id="defense" value="5" />
-        </label>
-
-        <label>
-          Rareté
-          <select id="rarity">
-            <option value="common">Commun</option>
-            <option value="uncommon">Peu commun</option>
-            <option value="rare">Rare</option>
-            <option value="legendary">Légendaire</option>
-          </select>
-        </label>
-
-        <div class="full">
-          <button type="submit">Créer la carte</button>
-          <div id="form-error" class="error"></div>
-        </div>
-      </form>
-    </section>
+    </div>
   </div>
 
   <script type="module">
@@ -533,6 +731,9 @@
     const SUPABASE_ANON_KEY = "sb_publishable_kISGOVkkUrKT8P_GfSKnOQ_NpMjQs15";
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Seul ce pseudo voit / peut utiliser la création de cartes
+    const ADMIN_NAME = "William";
 
     const cardsContainer = document.getElementById("cards");
     const statusEl = document.getElementById("status");
@@ -555,6 +756,9 @@
     const collectionSummary = document.getElementById("collection-summary");
     const reloadCollectionBtn = document.getElementById("reload-collection-btn");
 
+    const packOverlay = document.getElementById("pack-overlay");
+    const createSection = document.getElementById("create-section");
+
     const PACK_COOLDOWN_HOURS = 3;
     const CARDS_PER_PACK = 3;
 
@@ -572,11 +776,21 @@
       statusEl.textContent = message || "";
     }
 
+    function updateCreateSectionVisibility() {
+      if (!createSection) return;
+      if (currentPlayer === ADMIN_NAME) {
+        createSection.style.display = "block";
+      } else {
+        createSection.style.display = "none";
+      }
+    }
+
     function loadPlayerFromStorage() {
       const stored = localStorage.getItem("tcg_player_name");
       currentPlayer = stored && stored.trim() !== "" ? stored : null;
       updateAuthUI();
       updatePackTimer();
+      updateCreateSectionVisibility();
     }
 
     function updateAuthUI() {
@@ -646,6 +860,9 @@
       const div = document.createElement("div");
       div.className = "card";
 
+      const rarity = card.rarity || "common";
+      div.classList.add("rarity-" + rarity);
+
       if (quantity && quantity > 1) {
         const q = document.createElement("div");
         q.className = "quantity-badge";
@@ -674,7 +891,6 @@
 
       const badge = document.createElement("span");
       badge.className = "badge";
-      const rarity = card.rarity || "common";
       badge.textContent = RARITY_LABELS[rarity] || "Commun";
       badge.classList.add("rarity-" + rarity);
 
@@ -780,6 +996,10 @@
 
       if (!currentPlayer) {
         formError.textContent = "Connecte-toi d'abord avec un pseudo en haut 🙂";
+        return;
+      }
+      if (currentPlayer !== ADMIN_NAME) {
+        formError.textContent = "Seul l'admin peut créer des cartes.";
         return;
       }
 
@@ -940,6 +1160,13 @@
       return pool[Math.floor(Math.random() * pool.length)];
     }
 
+    function showPackOverlay() {
+      packOverlay.classList.add("visible");
+    }
+    function hidePackOverlay() {
+      packOverlay.classList.remove("visible");
+    }
+
     async function handleOpenPack() {
       if (!currentPlayer) {
         alert("Connecte-toi d'abord avec un pseudo en haut 🙂");
@@ -960,39 +1187,47 @@
         return;
       }
 
-      const drawn = [];
-      for (let i = 0; i < CARDS_PER_PACK; i++) {
-        drawn.push(pickRandomCardWeighted(lastLoadedCards));
-      }
+      showPackOverlay();
+      openPackBtn.disabled = true;
 
-      packCardsContainer.innerHTML = "";
-      drawn.forEach(card => {
-        const el = createCardElement(card);
-        packCardsContainer.appendChild(el);
-      });
-
-      try {
-        const rows = drawn.map(c => ({
-          owner_name: currentPlayer,
-          card_id: c.id
-        }));
-
-        const { error } = await supabase
-          .from("card_collection")
-          .insert(rows);
-
-        if (error) {
-          console.error(error);
-          alert("Les cartes ont été tirées, mais erreur lors de l'enregistrement de la collection.");
-        } else {
-          await loadCollection();
+      setTimeout(async () => {
+        const drawn = [];
+        for (let i = 0; i < CARDS_PER_PACK; i++) {
+          drawn.push(pickRandomCardWeighted(lastLoadedCards));
         }
-      } catch (e) {
-        console.error(e);
-      }
 
-      setNextPackTime(PACK_COOLDOWN_HOURS);
-      updatePackTimer();
+        packCardsContainer.innerHTML = "";
+        drawn.forEach(card => {
+          const el = createCardElement(card);
+          el.classList.add("card-reveal");
+          packCardsContainer.appendChild(el);
+        });
+
+        try {
+          const rows = drawn.map(c => ({
+            owner_name: currentPlayer,
+            card_id: c.id
+          }));
+
+          const { error } = await supabase
+            .from("card_collection")
+            .insert(rows);
+
+          if (error) {
+            console.error(error);
+            alert("Les cartes ont été tirées, mais erreur lors de l'enregistrement de la collection.");
+          } else {
+            await loadCollection();
+          }
+        } catch (e) {
+          console.error(e);
+        }
+
+        setNextPackTime(PACK_COOLDOWN_HOURS);
+        updatePackTimer();
+        hidePackOverlay();
+        openPackBtn.disabled = false;
+      }, 1100);
     }
 
     async function loadCollection() {
@@ -1059,6 +1294,7 @@
       localStorage.setItem("tcg_player_name", currentPlayer);
       updateAuthUI();
       updatePackTimer();
+      updateCreateSectionVisibility();
       loadCards();
       loadCollection();
     });
@@ -1068,6 +1304,7 @@
       currentPlayer = null;
       updateAuthUI();
       updatePackTimer();
+      updateCreateSectionVisibility();
       loadCards();
       collectionCardsContainer.innerHTML = "";
       collectionEmptyText.textContent = "Connecte-toi avec un pseudo pour voir ta collection.";
@@ -1079,7 +1316,7 @@
     });
 
     reloadBtn.addEventListener("click", loadCards);
-    form.addEventListener("submit", handleAddCard);
+    if (form) form.addEventListener("submit", handleAddCard);
     openPackBtn.addEventListener("click", handleOpenPack);
     reloadCollectionBtn.addEventListener("click", loadCollection);
 
