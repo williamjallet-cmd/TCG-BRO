@@ -5,45 +5,134 @@
   <title>TCG – La bande</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    :root {
+      --bg: #020617;
+      --bg-soft: #030712;
+      --border: #1f2937;
+      --accent: #4f46e5;
+      --accent-soft: #6366f1;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+    }
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #020617;
-      color: #e5e7eb;
+      background: radial-gradient(circle at top, #111827, #020617 45%, #000 80%);
+      color: var(--text);
+      min-height: 100vh;
     }
     .app {
-      max-width: 900px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 16px;
     }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(17, 24, 39, 0.95));
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(10px);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-orb {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: conic-gradient(from 180deg, #f97316, #4f46e5, #22c55e, #f97316);
+      padding: 2px;
+      box-shadow: 0 0 20px rgba(129, 140, 248, 0.9);
+    }
+    .logo-orb-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #1f2937, #020617);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.12em;
+      color: #e5e7eb;
+    }
     h1 {
-      font-size: 1.8rem;
-      margin-bottom: 4px;
+      font-size: 1.6rem;
+      margin: 0;
     }
     .subtitle {
-      font-size: 0.9rem;
-      color: #9ca3af;
-      margin-bottom: 16px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: 0;
     }
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    .chip {
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
     .section-title {
       margin-top: 24px;
       margin-bottom: 8px;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .panel {
+      margin-bottom: 18px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: radial-gradient(circle at top left, #111827, #020617 55%);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.75);
     }
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
     }
+
     .card {
-      border-radius: 12px;
-      border: 1px solid #1f2937;
+      position: relative;
+      border-radius: 14px;
+      border: 1px solid #111827;
       background: radial-gradient(circle at top, #111827, #020617);
       padding: 8px;
       display: flex;
       flex-direction: column;
       gap: 6px;
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.7);
+      overflow: hidden;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 16px 28px rgba(15, 23, 42, 0.9);
+      border-color: #4f46e5;
     }
     .card-image {
       border-radius: 10px;
@@ -64,6 +153,7 @@
       justify-content: space-between;
       align-items: baseline;
       gap: 8px;
+      margin-top: 4px;
     }
     .card-name {
       font-weight: 600;
@@ -79,12 +169,43 @@
       color: #9ca3af;
       font-style: italic;
     }
-    .card-stats {
+    .card-stats-row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.8rem;
+      align-items: center;
       margin-top: 4px;
+      font-size: 0.78rem;
     }
+    .card-stats {
+      display: flex;
+      gap: 6px;
+    }
+    .pill-stat {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      font-size: 0.7rem;
+    }
+
+    .delete-btn {
+      border: none;
+      background: rgba(220, 38, 38, 0.1);
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 0.7rem;
+      color: #fecaca;
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .delete-btn:hover {
+      background: rgba(239, 68, 68, 0.18);
+      transform: translateY(-1px);
+    }
+
     .badge {
       font-size: 0.65rem;
       padding: 2px 6px;
@@ -94,6 +215,28 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
+    .badge.rarity-common {
+      border-color: #6b7280;
+      color: #d1d5db;
+      background: linear-gradient(135deg, #111827, #020617);
+    }
+    .badge.rarity-uncommon {
+      border-color: #22c55e;
+      color: #bbf7d0;
+      background: radial-gradient(circle at top, rgba(34, 197, 94, 0.4), #020617);
+    }
+    .badge.rarity-rare {
+      border-color: #3b82f6;
+      color: #bfdbfe;
+      background: radial-gradient(circle at top, rgba(59, 130, 246, 0.35), #020617);
+    }
+    .badge.rarity-legendary {
+      border-color: #fbbf24;
+      color: #fef3c7;
+      background: radial-gradient(circle at top, rgba(251, 191, 36, 0.6), #020617);
+      box-shadow: 0 0 12px rgba(250, 204, 21, 0.65);
+    }
+
     .toolbar {
       display: flex;
       align-items: center;
@@ -107,30 +250,46 @@
       padding: 8px 16px;
       font-size: 0.9rem;
       cursor: pointer;
-      background: #4f46e5;
+      background: var(--accent);
       color: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+      box-shadow: 0 8px 18px rgba(79, 70, 229, 0.5);
+    }
+    button:hover:not(:disabled) {
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(79, 70, 229, 0.7);
     }
     button.secondary {
       background: #111827;
       border: 1px solid #374151;
+      box-shadow: none;
+    }
+    button.secondary:hover:not(:disabled) {
+      background: #020617;
     }
     button:disabled {
       opacity: 0.6;
       cursor: default;
+      box-shadow: none;
     }
     .status {
       font-size: 0.8rem;
       color: #9ca3af;
     }
+
     form {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px 12px;
       margin-top: 8px;
       padding: 12px;
-      border-radius: 12px;
+      border-radius: 14px;
       border: 1px solid #1f2937;
-      background: #020617;
+      background: radial-gradient(circle at top left, #020617, #030712);
     }
     form .full {
       grid-column: 1 / -1;
@@ -141,7 +300,7 @@
       flex-direction: column;
       gap: 4px;
     }
-    input, textarea {
+    input, textarea, select {
       border-radius: 8px;
       border: 1px solid #374151;
       padding: 6px 8px;
@@ -150,7 +309,7 @@
       font-size: 0.85rem;
       resize: vertical;
     }
-    input:focus, textarea:focus {
+    input:focus, textarea:focus, select:focus {
       outline: 1px solid #4f46e5;
       border-color: #4f46e5;
     }
@@ -159,15 +318,14 @@
       font-size: 0.8rem;
       margin-top: 4px;
     }
-    .auth-box {
+
+    .auth-box, .pack-box, .collection-box {
       padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #1f2937;
-      background: #020617;
-      margin-bottom: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: radial-gradient(circle at top left, #020617, #020617 55%);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.75);
+      margin-bottom: 18px;
     }
     .auth-row {
       display: flex;
@@ -186,24 +344,35 @@
       font-size: 0.8rem;
       color: #9ca3af;
     }
-    .pack-box {
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #1f2937;
-      background: #020617;
-      margin-bottom: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .pack-results {
-      margin-top: 8px;
-    }
     .pack-timer {
       font-size: 0.85rem;
       color: #9ca3af;
     }
+    .collection-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .quantity-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: #f59e0b;
+      color: #111827;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-weight: 600;
+      border: 1px solid #92400e;
+    }
+
     @media (max-width: 640px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
       form {
         grid-template-columns: 1fr;
       }
@@ -211,18 +380,35 @@
         flex-direction: column;
         align-items: stretch;
       }
+      .collection-header {
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <h1>TCG – La bande</h1>
-    <p class="subtitle">
-      Petites cartes avec la tête de tes potes 😎 – avec pseudo + packs à ouvrir toutes les X heures.
-    </p>
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo-orb">
+          <div class="logo-orb-inner">TCG</div>
+        </div>
+        <div>
+          <h1>TCG – La bande</h1>
+          <p class="subtitle">
+            Packs, raretés, collection & gestion des cartes entre potes 😎
+          </p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="chip">Prototype entre potes</div>
+        <div class="chip">Supabase + Vercel</div>
+      </div>
+    </header>
 
-    <!-- SECTION CONNEXION -->
-    <div class="auth-box">
+    <!-- CONNEXION -->
+    <section class="auth-box panel">
       <div class="section-title">👤 Connexion</div>
       <div id="auth-logged" style="display:none;">
         <div class="auth-row">
@@ -245,37 +431,52 @@
       <p class="status">
         Le pseudo est seulement enregistré dans ton navigateur, pas de mot de passe, pas d'email 🙂
       </p>
-    </div>
+    </section>
 
-    <!-- SECTION PACK -->
-    <div class="pack-box">
+    <!-- PACKS -->
+    <section class="pack-box panel">
       <div class="section-title">🎁 Ouvrir un pack</div>
       <p class="pack-timer" id="pack-timer-text">
         Connecte-toi avec un pseudo, puis ouvre un pack !
       </p>
-      <button id="open-pack-btn">Ouvrir un pack</button>
+      <button id="open-pack-btn">✨ Ouvrir un pack</button>
       <div class="pack-results">
         <div class="section-title" style="margin-top: 8px; margin-bottom:4px;font-size:1rem;">
           Résultat du dernier pack
         </div>
         <div id="pack-cards" class="cards-grid"></div>
       </div>
-    </div>
+    </section>
 
-    <div class="section">
-      <div class="section-title">📦 Cartes existantes</div>
+    <!-- COLLECTION -->
+    <section class="collection-box panel">
+      <div class="collection-header">
+        <div class="section-title">📚 Ma collection</div>
+        <div class="pill" id="collection-summary"></div>
+      </div>
+      <button id="reload-collection-btn" class="secondary" style="margin-bottom:8px;">
+        Recharger ma collection
+      </button>
+      <div id="collection-cards" class="cards-grid"></div>
+      <p id="collection-empty-text" class="status"></p>
+    </section>
+
+    <!-- TOUTES LES CARTES -->
+    <section class="panel">
+      <div class="section-title">📦 Toutes les cartes du jeu</div>
       <div class="toolbar">
         <button id="reload-btn" class="secondary">Recharger les cartes</button>
         <label class="pill">
           <input type="checkbox" id="filter-mine" style="margin-right:6px;" />
-          Afficher seulement mes cartes
+          Afficher seulement mes cartes créées
         </label>
         <span id="status" class="status"></span>
       </div>
       <div id="cards" class="cards-grid"></div>
-    </div>
+    </section>
 
-    <div class="section">
+    <!-- AJOUT CARTE -->
+    <section class="panel">
       <div class="section-title">➕ Ajouter une carte</div>
       <form id="card-form">
         <label class="full">
@@ -306,21 +507,30 @@
           Défense
           <input type="number" id="defense" value="5" />
         </label>
+
+        <label>
+          Rareté
+          <select id="rarity">
+            <option value="common">Commun</option>
+            <option value="uncommon">Peu commun</option>
+            <option value="rare">Rare</option>
+            <option value="legendary">Légendaire</option>
+          </select>
+        </label>
+
         <div class="full">
           <button type="submit">Créer la carte</button>
           <div id="form-error" class="error"></div>
         </div>
       </form>
-    </div>
+    </section>
   </div>
 
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-    // ⬇⬇⬇ IMPORTANT : tes valeurs Supabase ⬇⬇⬇
     const SUPABASE_URL = "https://mmqxwuavksjnrdzwqogu.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_kISGOVkkUrKT8P_GfSKnOQ_NpMjQs15";
-    // ⬆⬆⬆ IMPORTANT : tes valeurs Supabase ⬆⬆⬆
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -340,12 +550,23 @@
     const openPackBtn = document.getElementById("open-pack-btn");
     const packCardsContainer = document.getElementById("pack-cards");
 
-    // Config cooldown pack
+    const collectionCardsContainer = document.getElementById("collection-cards");
+    const collectionEmptyText = document.getElementById("collection-empty-text");
+    const collectionSummary = document.getElementById("collection-summary");
+    const reloadCollectionBtn = document.getElementById("reload-collection-btn");
+
     const PACK_COOLDOWN_HOURS = 3;
     const CARDS_PER_PACK = 3;
 
     let currentPlayer = null;
     let lastLoadedCards = [];
+
+    const RARITY_LABELS = {
+      common: "Commun",
+      uncommon: "Peu commun",
+      rare: "Rare",
+      legendary: "Légendaire"
+    };
 
     function setStatus(message) {
       statusEl.textContent = message || "";
@@ -353,11 +574,7 @@
 
     function loadPlayerFromStorage() {
       const stored = localStorage.getItem("tcg_player_name");
-      if (stored && stored.trim() !== "") {
-        currentPlayer = stored;
-      } else {
-        currentPlayer = null;
-      }
+      currentPlayer = stored && stored.trim() !== "" ? stored : null;
       updateAuthUI();
       updatePackTimer();
     }
@@ -400,10 +617,6 @@
       return Math.max(0, next.getTime() - now.getTime());
     }
 
-    function canOpenPack() {
-      return msUntilNextPack() === 0;
-    }
-
     function formatDuration(ms) {
       const totalSeconds = Math.floor(ms / 1000);
       const h = Math.floor(totalSeconds / 3600);
@@ -429,9 +642,16 @@
       }
     }
 
-    function createCardElement(card) {
+    function createCardElement(card, { quantity = null, allowDelete = false, onDelete = null } = {}) {
       const div = document.createElement("div");
       div.className = "card";
+
+      if (quantity && quantity > 1) {
+        const q = document.createElement("div");
+        q.className = "quantity-badge";
+        q.textContent = "x" + quantity;
+        div.appendChild(q);
+      }
 
       const imageDiv = document.createElement("div");
       imageDiv.className = "card-image";
@@ -454,7 +674,9 @@
 
       const badge = document.createElement("span");
       badge.className = "badge";
-      badge.textContent = "Pote";
+      const rarity = card.rarity || "common";
+      badge.textContent = RARITY_LABELS[rarity] || "Commun";
+      badge.classList.add("rarity-" + rarity);
 
       nameRow.appendChild(nameEl);
       nameRow.appendChild(badge);
@@ -465,21 +687,40 @@
 
       const owner = document.createElement("div");
       owner.className = "card-owner";
-      if (card.owner_name) {
-        owner.textContent = `Propriétaire : ${card.owner_name}`;
-      } else {
-        owner.textContent = "Propriétaire : (inconnu)";
-      }
+      owner.textContent = card.owner_name
+        ? `Créée par : ${card.owner_name}`
+        : "Créateur : (inconnu)";
+
+      const statsRow = document.createElement("div");
+      statsRow.className = "card-stats-row";
 
       const stats = document.createElement("div");
       stats.className = "card-stats";
-      stats.innerHTML = `<span>ATK: ${card.attack ?? 0}</span><span>DEF: ${card.defense ?? 0}</span>`;
+      const atk = document.createElement("span");
+      atk.className = "pill-stat";
+      atk.textContent = "ATK " + (card.attack ?? 0);
+      const def = document.createElement("span");
+      def.className = "pill-stat";
+      def.textContent = "DEF " + (card.defense ?? 0);
+      stats.appendChild(atk);
+      stats.appendChild(def);
+
+      statsRow.appendChild(stats);
+
+      if (allowDelete && typeof onDelete === "function") {
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "delete-btn";
+        delBtn.innerHTML = "🗑 Supprimer";
+        delBtn.addEventListener("click", () => onDelete(card));
+        statsRow.appendChild(delBtn);
+      }
 
       div.appendChild(imageDiv);
       div.appendChild(nameRow);
       div.appendChild(desc);
       div.appendChild(owner);
-      div.appendChild(stats);
+      div.appendChild(statsRow);
       return div;
     }
 
@@ -495,7 +736,11 @@
       }
       setStatus(`Cartes affichées : ${cardsToShow.length}`);
       cardsToShow.forEach(card => {
-        const el = createCardElement(card);
+        const canDelete = currentPlayer && card.owner_name === currentPlayer;
+        const el = createCardElement(card, {
+          allowDelete: canDelete,
+          onDelete: handleDeleteCard
+        });
         cardsContainer.appendChild(el);
       });
     }
@@ -543,6 +788,7 @@
       const description = document.getElementById("description").value.trim();
       const attack = parseInt(document.getElementById("attack").value || "0", 10);
       const defense = parseInt(document.getElementById("defense").value || "0", 10);
+      const rarity = document.getElementById("rarity").value || "common";
       const fileInput = document.getElementById("image_file");
       const file = fileInput.files[0];
 
@@ -553,7 +799,6 @@
 
       let finalImageUrl = imageUrlField || null;
 
-      // Upload fichier si choisi
       if (file) {
         try {
           const ext = file.name.split(".").pop();
@@ -591,7 +836,8 @@
           description: description || null,
           attack,
           defense,
-          owner_name: currentPlayer
+          owner_name: currentPlayer,
+          rarity
         });
 
         if (error) {
@@ -603,11 +849,95 @@
         form.reset();
         document.getElementById("attack").value = "5";
         document.getElementById("defense").value = "5";
+        document.getElementById("rarity").value = "common";
         await loadCards();
       } catch (e) {
         console.error(e);
         formError.textContent = "Erreur inconnue.";
       }
+    }
+
+    async function handleDeleteCard(card) {
+      if (!currentPlayer || card.owner_name !== currentPlayer) {
+        alert("Tu ne peux supprimer que les cartes que tu as créées.");
+        return;
+      }
+      const ok = confirm(`Supprimer définitivement la carte "${card.name}" ?`);
+      if (!ok) return;
+
+      try {
+        const { error } = await supabase
+          .from("cards")
+          .delete()
+          .eq("id", card.id);
+
+        if (error) {
+          console.error(error);
+          alert("Erreur lors de la suppression de la carte.");
+          return;
+        }
+
+        await loadCards();
+        await loadCollection();
+      } catch (e) {
+        console.error(e);
+        alert("Erreur inconnue lors de la suppression.");
+      }
+    }
+
+    function pickRandomCardWeighted(cards) {
+      const pools = {
+        common: [],
+        uncommon: [],
+        rare: [],
+        legendary: []
+      };
+
+      cards.forEach(c => {
+        const r = c.rarity || "common";
+        if (!pools[r]) {
+          pools.common.push(c);
+        } else {
+          pools[r].push(c);
+        }
+      });
+
+      const weightsDef = [
+        { rarity: "common", weight: 60 },
+        { rarity: "uncommon", weight: 25 },
+        { rarity: "rare", weight: 12 },
+        { rarity: "legendary", weight: 3 }
+      ];
+
+      const activePools = [];
+      const weights = [];
+
+      weightsDef.forEach(entry => {
+        if (pools[entry.rarity].length > 0) {
+          activePools.push(entry.rarity);
+          weights.push(entry.weight);
+        }
+      });
+
+      if (activePools.length === 0) {
+        return cards[Math.floor(Math.random() * cards.length)];
+      }
+
+      const totalWeight = weights.reduce((a, b) => a + b, 0);
+      const rnd = Math.random() * totalWeight;
+      let acc = 0;
+      let chosenRarity = activePools[0];
+
+      for (let i = 0; i < activePools.length; i++) {
+        acc += weights[i];
+        if (rnd <= acc) {
+          chosenRarity = activePools[i];
+          break;
+        }
+      }
+
+      const pool = pools[chosenRarity];
+      return pool[Math.floor(Math.random() * pool.length)];
     }
 
     async function handleOpenPack() {
@@ -622,7 +952,6 @@
         return;
       }
 
-      // S'assurer qu'on a des cartes chargées
       if (!lastLoadedCards || lastLoadedCards.length === 0) {
         await loadCards();
       }
@@ -631,26 +960,96 @@
         return;
       }
 
-      // Tirer CARDS_PER_PACK cartes au hasard (avec répétitions possibles)
       const drawn = [];
       for (let i = 0; i < CARDS_PER_PACK; i++) {
-        const idx = Math.floor(Math.random() * lastLoadedCards.length);
-        drawn.push(lastLoadedCards[idx]);
+        drawn.push(pickRandomCardWeighted(lastLoadedCards));
       }
 
-      // Afficher le résultat dans la zone pack-cards
       packCardsContainer.innerHTML = "";
       drawn.forEach(card => {
         const el = createCardElement(card);
         packCardsContainer.appendChild(el);
       });
 
-      // Fixer le prochain pack
+      try {
+        const rows = drawn.map(c => ({
+          owner_name: currentPlayer,
+          card_id: c.id
+        }));
+
+        const { error } = await supabase
+          .from("card_collection")
+          .insert(rows);
+
+        if (error) {
+          console.error(error);
+          alert("Les cartes ont été tirées, mais erreur lors de l'enregistrement de la collection.");
+        } else {
+          await loadCollection();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
       setNextPackTime(PACK_COOLDOWN_HOURS);
       updatePackTimer();
     }
 
-    // Gestion "login" par pseudo
+    async function loadCollection() {
+      collectionCardsContainer.innerHTML = "";
+      collectionEmptyText.textContent = "";
+      collectionSummary.textContent = "";
+
+      if (!currentPlayer) {
+        collectionEmptyText.textContent = "Connecte-toi avec un pseudo pour voir ta collection.";
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("card_collection")
+          .select("card_id")
+          .eq("owner_name", currentPlayer);
+
+        if (error) {
+          console.error(error);
+          collectionEmptyText.textContent = "Erreur lors du chargement de la collection.";
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          collectionEmptyText.textContent = "Tu n'as encore aucune carte dans ta collection. Ouvre un pack pour commencer 🎁";
+          return;
+        }
+
+        const counts = {};
+        data.forEach(row => {
+          counts[row.card_id] = (counts[row.card_id] || 0) + 1;
+        });
+
+        if (!lastLoadedCards || lastLoadedCards.length === 0) {
+          await loadCards();
+        }
+
+        let totalCopies = 0;
+        let distinctCards = 0;
+
+        Object.entries(counts).forEach(([cardId, qty]) => {
+          const card = lastLoadedCards.find(c => c.id === cardId);
+          if (!card) return;
+          distinctCards += 1;
+          totalCopies += qty;
+          const el = createCardElement(card, { quantity: qty });
+          collectionCardsContainer.appendChild(el);
+        });
+
+        collectionSummary.textContent = `${distinctCards} cartes différentes – ${totalCopies} exemplaires au total`;
+      } catch (e) {
+        console.error(e);
+        collectionEmptyText.textContent = "Erreur inconnue lors du chargement de la collection.";
+      }
+    }
+
     authForm.addEventListener("submit", (event) => {
       event.preventDefault();
       const input = document.getElementById("player_name");
@@ -661,6 +1060,7 @@
       updateAuthUI();
       updatePackTimer();
       loadCards();
+      loadCollection();
     });
 
     logoutBtn.addEventListener("click", () => {
@@ -669,6 +1069,9 @@
       updateAuthUI();
       updatePackTimer();
       loadCards();
+      collectionCardsContainer.innerHTML = "";
+      collectionEmptyText.textContent = "Connecte-toi avec un pseudo pour voir ta collection.";
+      collectionSummary.textContent = "";
     });
 
     filterMineCheckbox.addEventListener("change", () => {
@@ -678,13 +1081,13 @@
     reloadBtn.addEventListener("click", loadCards);
     form.addEventListener("submit", handleAddCard);
     openPackBtn.addEventListener("click", handleOpenPack);
+    reloadCollectionBtn.addEventListener("click", loadCollection);
 
-    // Timer du pack mis à jour régulièrement
     setInterval(updatePackTimer, 1000);
 
-    // Initialisation
     loadPlayerFromStorage();
     loadCards();
+    loadCollection();
   </script>
 </body>
 </html>
