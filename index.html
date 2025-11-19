@@ -33,25 +33,25 @@
       padding: 16px;
     }
 
-    /* HEADER */
+    /* HEADER CENTRÉ */
     .header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       gap: 12px;
       margin-bottom: 16px;
       padding: 14px 18px;
       border-radius: 18px;
       border: 1px solid rgba(148, 163, 184, 0.3);
-      background:
-        linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(17, 24, 39, 0.98));
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(17, 24, 39, 0.98));
       box-shadow: 0 24px 45px rgba(15, 23, 42, 0.8);
       backdrop-filter: blur(12px);
     }
     .header-left {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
     }
     .logo-orb {
       width: 46px;
@@ -76,43 +76,10 @@
       letter-spacing: 0.12em;
       color: #e5e7eb;
     }
-    h1 {
-      font-size: 1.7rem;
-      margin: 0 0 2px;
-    }
-    .subtitle {
-      font-size: 0.85rem;
-      color: var(--muted);
+    h1,
+    .app-title {
+      font-size: 1.9rem;
       margin: 0;
-    }
-    .header-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-    }
-    .chip {
-      font-size: 0.7rem;
-      padding: 3px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      background: rgba(15, 23, 42, 0.8);
-    }
-
-    /* LAYOUT */
-    .layout-main {
-      display: grid;
-      grid-template-columns: minmax(0, 1.5fr) minmax(0, 2fr);
-      gap: 16px;
-      align-items: flex-start;
-    }
-    .column {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
     }
 
     .section-title {
@@ -135,6 +102,45 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
+    }
+
+    /* NAV PRINCIPALE */
+    .main-nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 8px 0 16px;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+      box-shadow: 0 0 0 rgba(0,0,0,0);
+    }
+    .nav-btn:hover {
+      background: #111827;
+      transform: translateY(-1px);
+    }
+    .nav-btn.active {
+      background: var(--accent);
+      border-color: var(--accent-soft);
+      box-shadow: 0 8px 18px rgba(79, 70, 229, 0.6);
+    }
+
+    .view {
+      display: none;
+    }
+    .view.active {
+      display: block;
     }
 
     /* CARDS */
@@ -538,15 +544,9 @@
       }
     }
 
-    @media (max-width: 900px) {
-      .layout-main {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
     @media (max-width: 640px) {
       .header {
         flex-direction: column;
-        align-items: flex-start;
       }
       form {
         grid-template-columns: 1fr;
@@ -578,55 +578,53 @@
   </div>
 
   <div class="app">
-    <!-- HEADER -->
+    <!-- HEADER CENTRÉ -->
     <header class="header">
       <div class="header-left">
         <div class="logo-orb">
           <div class="logo-orb-inner">BRO</div>
         </div>
-        <div>
-          <h1>Brokemon</h1>
-          <p class="subtitle">
-            Packs, raretés, collection & gestion des cartes entre potes 😎
-          </p>
-        </div>
-      </div>
-      <div class="header-right">
-        <div class="chip">Prototype entre potes</div>
-        <div class="chip">Supabase + Vercel</div>
+        <h1 class="app-title">Brokemon</h1>
       </div>
     </header>
 
-    <div class="layout-main">
-      <!-- COLONNE GAUCHE : Connexion + Pack + Collection -->
-      <div class="column">
-        <!-- CONNEXION -->
-        <section class="auth-box panel">
-          <div class="section-title">👤 Connexion</div>
-          <div id="auth-logged" style="display:none;">
-            <div class="auth-row">
-              <span class="pill">
-                Connecté en tant que <strong id="current-player-label"></strong>
-              </span>
-              <button id="logout-btn" class="secondary">Changer de pseudo</button>
-            </div>
-          </div>
+    <!-- CONNEXION (toujours visible) -->
+    <section class="auth-box panel">
+      <div class="section-title">👤 Connexion</div>
+      <div id="auth-logged" style="display:none;">
+        <div class="auth-row">
+          <span class="pill">
+            Connecté en tant que <strong id="current-player-label"></strong>
+          </span>
+          <button id="logout-btn" class="secondary">Changer de pseudo</button>
+        </div>
+      </div>
 
-          <form id="auth-form">
-            <div class="auth-row">
-              <label>
-                Ton pseudo
-                <input type="text" id="player_name" required placeholder="Ex: William" />
-              </label>
-              <button type="submit">Se connecter</button>
-            </div>
-          </form>
-          <p class="status">
-            Le pseudo est seulement enregistré dans ton navigateur, pas de mot de passe, pas d'email 🙂
-          </p>
-        </section>
+      <form id="auth-form">
+        <div class="auth-row">
+          <label>
+            Ton pseudo
+            <input type="text" id="player_name" required placeholder="Ex: William" />
+          </label>
+          <button type="submit">Se connecter</button>
+        </div>
+      </form>
+      <p class="status">
+        Le pseudo est seulement enregistré dans ton navigateur, pas de mot de passe, pas d'email 🙂
+      </p>
+    </section>
 
-        <!-- PACKS -->
+    <!-- MENU PRINCIPAL -->
+    <nav class="main-nav">
+      <button class="nav-btn active" data-view="pack">🎁 Ouvrir mon pack</button>
+      <button class="nav-btn" data-view="collection">📚 Ma collection</button>
+      <button class="nav-btn" data-view="admin" id="admin-tab" style="display:none;">🛠 Admin</button>
+    </nav>
+
+    <!-- VUES -->
+    <div class="views">
+      <!-- VUE PACK -->
+      <div id="view-pack" class="view active">
         <section class="pack-box panel">
           <div class="section-title">🎁 Ouvrir un pack</div>
           <p class="pack-timer" id="pack-timer-text">
@@ -640,8 +638,10 @@
             <div id="pack-cards" class="cards-grid"></div>
           </div>
         </section>
+      </div>
 
-        <!-- COLLECTION -->
+      <!-- VUE COLLECTION -->
+      <div id="view-collection" class="view">
         <section class="collection-box panel">
           <div class="collection-header">
             <div class="section-title">📚 Ma collection</div>
@@ -655,9 +655,8 @@
         </section>
       </div>
 
-      <!-- COLONNE DROITE : Toutes les cartes + ajout -->
-      <div class="column">
-        <!-- TOUTES LES CARTES -->
+      <!-- VUE ADMIN (TOUTES LES CARTES + CREATION) -->
+      <div id="view-admin" class="view">
         <section class="panel">
           <div class="section-title">📦 Toutes les cartes du jeu</div>
           <div class="toolbar">
@@ -671,7 +670,6 @@
           <div id="cards" class="cards-grid"></div>
         </section>
 
-        <!-- AJOUT CARTE (ADMIN SEULEMENT) -->
         <section id="create-section" class="panel" style="display:none;">
           <div class="section-title">➕ Ajouter une carte</div>
           <form id="card-form">
@@ -732,7 +730,7 @@
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Seul ce pseudo voit / peut utiliser la création de cartes
+    // Seul ce pseudo voit / peut utiliser la création de cartes et l'onglet Admin
     const ADMIN_NAME = "William";
 
     const cardsContainer = document.getElementById("cards");
@@ -759,6 +757,14 @@
     const packOverlay = document.getElementById("pack-overlay");
     const createSection = document.getElementById("create-section");
 
+    const navButtons = document.querySelectorAll(".nav-btn");
+    const adminTab = document.getElementById("admin-tab");
+    const views = {
+      pack: document.getElementById("view-pack"),
+      collection: document.getElementById("view-collection"),
+      admin: document.getElementById("view-admin")
+    };
+
     const PACK_COOLDOWN_HOURS = 3;
     const CARDS_PER_PACK = 3;
 
@@ -776,12 +782,28 @@
       statusEl.textContent = message || "";
     }
 
+    function showView(name) {
+      Object.entries(views).forEach(([key, el]) => {
+        if (!el) return;
+        el.classList.toggle("active", key === name);
+      });
+      navButtons.forEach(btn => {
+        const v = btn.dataset.view;
+        btn.classList.toggle("active", v === name);
+      });
+    }
+
     function updateCreateSectionVisibility() {
       if (!createSection) return;
       if (currentPlayer === ADMIN_NAME) {
         createSection.style.display = "block";
+        if (adminTab) adminTab.style.display = "inline-flex";
       } else {
         createSection.style.display = "none";
+        if (adminTab) adminTab.style.display = "none";
+        if (views.admin && views.admin.classList.contains("active")) {
+          showView("pack");
+        }
       }
     }
 
@@ -943,7 +965,7 @@
     function renderCards() {
       cardsContainer.innerHTML = "";
       let cardsToShow = lastLoadedCards;
-      if (filterMineCheckbox.checked && currentPlayer) {
+      if (filterMineCheckbox && filterMineCheckbox.checked && currentPlayer) {
         cardsToShow = cardsToShow.filter(c => c.owner_name === currentPlayer);
       }
       if (!cardsToShow.length) {
@@ -952,7 +974,7 @@
       }
       setStatus(`Cartes affichées : ${cardsToShow.length}`);
       cardsToShow.forEach(card => {
-        const canDelete = currentPlayer && card.owner_name === currentPlayer;
+        const canDelete = currentPlayer === ADMIN_NAME;
         const el = createCardElement(card, {
           allowDelete: canDelete,
           onDelete: handleDeleteCard
@@ -978,7 +1000,7 @@
 
         if (!data || data.length === 0) {
           lastLoadedCards = [];
-          setStatus("Aucune carte pour l’instant. Ajoute-en une en bas 👇");
+          setStatus("Aucune carte pour l’instant. Ajoute-en une en admin 👇");
           return;
         }
 
@@ -1077,27 +1099,40 @@
       }
     }
 
+    // Suppression admin-only : collection + carte
     async function handleDeleteCard(card) {
-      if (!currentPlayer || card.owner_name !== currentPlayer) {
-        alert("Tu ne peux supprimer que les cartes que tu as créées.");
+      if (!currentPlayer || currentPlayer !== ADMIN_NAME) {
+        alert("Seul William peut supprimer des cartes.");
         return;
       }
-      const ok = confirm(`Supprimer définitivement la carte "${card.name}" ?`);
+      const ok = confirm(`Supprimer définitivement la carte "${card.name}" et toutes ses occurrences ?`);
       if (!ok) return;
 
       try {
-        const { error } = await supabase
+        const { error: colError } = await supabase
+          .from("card_collection")
+          .delete()
+          .eq("card_id", card.id);
+
+        if (colError) {
+          console.error(colError);
+          alert("Erreur lors de la suppression dans la collection : " + colError.message);
+          return;
+        }
+
+        const { error: cardError } = await supabase
           .from("cards")
           .delete()
           .eq("id", card.id);
 
-        if (error) {
-          console.error(error);
-          alert("Erreur lors de la suppression de la carte.");
+        if (cardError) {
+          console.error(cardError);
+          alert("Erreur lors de la suppression de la carte : " + cardError.message);
           return;
         }
 
-        await loadCards();
+        lastLoadedCards = lastLoadedCards.filter(c => c.id !== card.id);
+        renderCards();
         await loadCollection();
       } catch (e) {
         console.error(e);
@@ -1285,6 +1320,15 @@
       }
     }
 
+    // NAV EVENTS
+    navButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const view = btn.dataset.view;
+        if (view === "admin" && currentPlayer !== ADMIN_NAME) return;
+        showView(view);
+      });
+    });
+
     authForm.addEventListener("submit", (event) => {
       event.preventDefault();
       const input = document.getElementById("player_name");
@@ -1309,13 +1353,16 @@
       collectionCardsContainer.innerHTML = "";
       collectionEmptyText.textContent = "Connecte-toi avec un pseudo pour voir ta collection.";
       collectionSummary.textContent = "";
+      showView("pack");
     });
 
-    filterMineCheckbox.addEventListener("change", () => {
-      renderCards();
-    });
+    if (filterMineCheckbox) {
+      filterMineCheckbox.addEventListener("change", () => {
+        renderCards();
+      });
+    }
 
-    reloadBtn.addEventListener("click", loadCards);
+    if (reloadBtn) reloadBtn.addEventListener("click", loadCards);
     if (form) form.addEventListener("submit", handleAddCard);
     openPackBtn.addEventListener("click", handleOpenPack);
     reloadCollectionBtn.addEventListener("click", loadCollection);
@@ -1325,6 +1372,7 @@
     loadPlayerFromStorage();
     loadCards();
     loadCollection();
+    showView("pack");
   </script>
 </body>
 </html>
