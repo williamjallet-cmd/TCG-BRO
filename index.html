@@ -4,6 +4,15 @@
   <meta charset="utf-8" />
   <title>Brokemon</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- PWA / écran d'accueil -->
+  <meta name="theme-color" content="#020617" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Brokemon" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
   <style>
     :root {
       --bg: #020617;
@@ -102,6 +111,11 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
+    }
+
+    /* Cartes un peu plus petites dans "Ma collection" */
+    #collection-cards {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     }
 
     /* NAV PRINCIPALE */
@@ -209,7 +223,7 @@
     .card-image img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain; /* image complète, pas rognée */
     }
     .card-name-row {
       display: flex;
@@ -430,7 +444,102 @@
       border: 1px solid #92400e;
     }
 
-    /* PACK ANIMATION OVERLAY */
+    /* Cartes compactes dans "Ma collection" */
+    #collection-cards {
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+    #collection-cards .card {
+      padding: 6px;
+    }
+    #collection-cards .card .card-name {
+      font-size: 0.85rem;
+    }
+    #collection-cards .card .card-desc {
+      font-size: 0.75rem;
+    }
+    #collection-cards .card .pill-stat {
+      font-size: 0.65rem;
+      padding: 1px 6px;
+    }
+
+    /* Style des cartes non possédées (cachées dans la collection) */
+    .card.hidden-card {
+      background: radial-gradient(circle at top, #020617, #000000);
+      border-color: #111827;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.9);
+    }
+    .card.hidden-card .card-image {
+      background: radial-gradient(circle at center, #020617, #000000);
+      border: 1px solid #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card.hidden-card .card-image span {
+      font-size: 1.2rem;
+      letter-spacing: 0.12em;
+      color: #6b7280;
+    }
+    .card.hidden-card .card-name,
+    .card.hidden-card .card-desc {
+      color: #6b7280;
+    }
+
+    /* Petit bouton numéro */
+    button.btn-small {
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      box-shadow: none;
+    }
+
+    /* MODAL D'INSPECTION DE CARTE */
+    .card-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    .card-modal.visible {
+      display: flex;
+    }
+    .card-modal-content {
+      background: radial-gradient(circle at top left, #020617, #020617 60%);
+      border-radius: 20px;
+      border: 1px solid #1f2937;
+      box-shadow: 0 24px 40px rgba(0,0,0,0.85);
+      padding: 12px;
+      max-width: 360px;
+      width: 90%;
+      position: relative;
+    }
+    .card-modal-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .card-modal-inner {
+      margin-top: 16px;
+    }
+    .card-modal-inner .card {
+      box-shadow: none;
+      transform: none;
+    }
+    .card-modal-inner .card:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* PACK ANIMATION OVERLAY FIXÉE AU CENTRE */
     .pack-overlay {
       position: fixed;
       inset: 0;
@@ -438,11 +547,12 @@
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 50;
+      z-index: 9999;
     }
     .pack-overlay.visible {
       display: flex;
     }
+
     .pack-box-anim {
       width: 220px;
       height: 260px;
@@ -460,6 +570,7 @@
       position: relative;
       overflow: hidden;
       animation: packPulse 0.9s ease-in-out infinite alternate;
+      cursor: pointer;
     }
     .pack-streak {
       position: absolute;
@@ -544,19 +655,306 @@
       }
     }
 
+    /* Effets de particules + secousses */
+    .pack-box-anim {
+      position: relative;
+      overflow: hidden;
+    }
+    .pack-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .pack-particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #facc15, #f97316);
+      opacity: 0;
+      animation: packParticle 0.8s ease-out forwards;
+    }
+    @keyframes packParticle {
+      0% {
+        transform: translateY(10px) scale(0.8);
+        opacity: 0;
+      }
+      30% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-60px) scale(1.4);
+        opacity: 0;
+      }
+    }
+
+    .pack-box-anim.opening {
+      animation:
+        packPulse 0.9s ease-in-out infinite alternate,
+        packShake 0.35s ease-in-out 1;
+    }
+    @keyframes packShake {
+      0%   { transform: translate(0, 0) rotate(0deg); }
+      20%  { transform: translate(-3px, 2px) rotate(-1deg); }
+      40%  { transform: translate(3px, -2px) rotate(1deg); }
+      60%  { transform: translate(-2px, 1px) rotate(-0.5deg); }
+      80%  { transform: translate(2px, -1px) rotate(0.5deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+    .pack-box-anim::after {
+      content: "";
+      position: absolute;
+      top: -40%;
+      left: -20%;
+      width: 140%;
+      height: 40%;
+      background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.8),
+        transparent
+      );
+      opacity: 0;
+      transform: translateY(0) rotate(-10deg);
+    }
+    .pack-box-anim.opening::after {
+      animation: packTearSlash 0.35s ease-out forwards;
+    }
+    @keyframes packTearSlash {
+      0% {
+        opacity: 0;
+        transform: translateY(0) rotate(-10deg);
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(160%) rotate(-10deg);
+      }
+    }
+
+    /* Étape 2 : cartes révélées après ouverture du pack */
+    .pack-cards-stage {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+    .pack-cards-inner {
+      max-width: 900px;
+      width: 95%;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .pack-cards-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+    .pack-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      justify-items: center;
+    }
+    .pack-cards-hint {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    /* Flip des cartes de pack (agrandies) */
+    .pack-card-wrapper {
+      width: 360px;
+      height: 460px;
+      perspective: 1000px;
+      position: relative;
+      border-radius: 18px;
+      cursor: pointer;
+      transition: transform 0.18s ease;
+    }
+    .pack-card-wrapper:hover {
+      transform: translateY(-4px);
+    }
+    .pack-card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+    }
+    .pack-card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+    }
+    .pack-card-back {
+      transform: rotateY(0deg);
+    }
+    .pack-card-front {
+      transform: rotateY(180deg);
+    }
+    .pack-card-wrapper.revealed .pack-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .pack-card-wrapper .card-pack {
+      width: 100%;
+      height: 100%;
+      box-shadow: 0 12px 26px rgba(0,0,0,0.9);
+    }
+    .pack-card-wrapper .card-pack .card-image {
+      aspect-ratio: 3 / 4;
+    }
+
+    /* Dos des cartes dans l'ouverture de pack : gros "?" seulement */
+    .pack-card-back .card {
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .pack-card-back .card-image {
+      background: radial-gradient(circle at center, #020617, #000000);
+      border: 1px solid #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pack-card-back .card-image span {
+      font-size: 2.3rem;
+      letter-spacing: 0.12em;
+      color: #e5e7eb;
+    }
+    /* Masquer description / owner / nom dans le dos des cartes du pack */
+    .pack-card-back .card-name,
+    .pack-card-back .card-desc,
+    .pack-card-back .card-owner {
+      display: none;
+    }
+
+    /* Image révélée dans le pack : pas rognée */
+    .pack-card-front .card-image img {
+      object-fit: contain;
+    }
+
+    /* Glow dynamique selon rareté une fois révélée */
+    .pack-card-wrapper.revealed.rarity-common {
+      animation: glowCommon 2s ease-in-out infinite;
+      box-shadow: 0 0 12px rgba(148,163,184,0.5);
+    }
+    .pack-card-wrapper.revealed.rarity-uncommon {
+      animation: glowUncommon 1.6s ease-in-out infinite;
+      box-shadow: 0 0 18px rgba(34,197,94,0.7);
+    }
+    .pack-card-wrapper.revealed.rarity-rare {
+      animation: glowRare 1.3s ease-in-out infinite;
+      box-shadow: 0 0 22px rgba(236,72,153,0.9);
+    }
+    .pack-card-wrapper.revealed.rarity-legendary {
+      animation: glowLegendary 1s ease-in-out infinite;
+      box-shadow:
+        0 0 24px rgba(250,204,21,1),
+        0 0 40px rgba(251,191,36,0.9);
+    }
+
+    @keyframes glowCommon {
+      0%, 100% { box-shadow: 0 0 6px rgba(148,163,184,0.3); transform: translateY(0); }
+      50% { box-shadow: 0 0 12px rgba(148,163,184,0.6); transform: translateY(-2px); }
+    }
+    @keyframes glowUncommon {
+      0%, 100% { box-shadow: 0 0 10px rgba(34,197,94,0.5); transform: translateY(0); }
+      50% { box-shadow: 0 0 18px rgba(34,197,94,0.9); transform: translateY(-3px); }
+    }
+    @keyframes glowRare {
+      0%, 100% { box-shadow: 0 0 12px rgba(236,72,153,0.7); transform: translateY(0); }
+      50% { box-shadow: 0 0 22px rgba(236,72,153,1); transform: translateY(-4px); }
+    }
+    @keyframes glowLegendary {
+      0%, 100% {
+        box-shadow:
+          0 0 16px rgba(250,204,21,0.9),
+          0 0 28px rgba(251,191,36,0.9);
+        transform: translateY(0) scale(1);
+      }
+      50% {
+        box-shadow:
+          0 0 26px rgba(250,204,21,1),
+          0 0 40px rgba(253,224,71,1);
+        transform: translateY(-4px) scale(1.03);
+      }
+    }
+
     @media (max-width: 640px) {
+      .app {
+        padding: 8px;
+      }
+
       .header {
         flex-direction: column;
+        text-align: center;
       }
+
       form {
         grid-template-columns: 1fr;
       }
+
       .auth-row {
         flex-direction: column;
         align-items: stretch;
       }
+
       .collection-header {
         align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      button {
+        width: 100%;
+        justify-content: center;
+        min-height: 40px;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 8px;
+      }
+
+      #collection-cards {
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      }
+
+      #collection-cards .card {
+        padding: 6px;
+      }
+
+      #collection-cards .card .card-name {
+        font-size: 0.8rem;
+      }
+
+      #collection-cards .card .card-desc {
+        font-size: 0.7rem;
+      }
+
+      #collection-cards .card .pill-stat {
+        font-size: 0.6rem;
+        padding: 1px 5px;
+      }
+
+      .pack-cards-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .pack-card-wrapper {
+        width: 200px;
+        height: 280px;
       }
     }
   </style>
@@ -564,7 +962,8 @@
 <body>
   <!-- OVERLAY ANIMATION PACK -->
   <div id="pack-overlay" class="pack-overlay">
-    <div class="pack-box-anim">
+    <!-- Étape 1 : pack fermé au centre, on clique pour l'ouvrir -->
+    <div id="pack-opening" class="pack-box-anim">
       <div class="pack-streak"></div>
       <div class="pack-icon">
         <div class="pack-icon-inner">
@@ -572,8 +971,20 @@
           <span>BROKEMON</span>
         </div>
       </div>
-      <div class="pack-text-main">Ouverture du pack...</div>
-      <div class="pack-text-sub">Prépare-toi à découvrir tes cartes ✨</div>
+      <div class="pack-text-main">Cliquer pour ouvrir le pack</div>
+      <div class="pack-text-sub">Déchire le booster et découvre tes cartes ✨</div>
+      <div class="pack-particles" id="pack-particles"></div>
+    </div>
+
+    <!-- Étape 2 : les 3 cartes face cachée, puis révélées -->
+    <div id="pack-cards-stage" class="pack-cards-stage">
+      <div class="pack-cards-inner">
+        <div class="pack-cards-title">Tes nouvelles cartes</div>
+        <div id="pack-cards" class="pack-cards-grid"></div>
+        <p class="pack-cards-hint">
+          Clique sur chaque carte pour la retourner. Clique en dehors pour fermer.
+        </p>
+      </div>
     </div>
   </div>
 
@@ -610,7 +1021,7 @@
         </div>
       </form>
       <p class="status">
-        Le pseudo est seulement enregistré dans ton navigateur, pas de mot de passe, pas d'email 🙂
+        Le pseudo est seulement enregistré dans ton navigateur, pas de mot de passe, pas d'email 🙂  
       </p>
     </section>
 
@@ -631,12 +1042,6 @@
             Connecte-toi avec un pseudo, puis ouvre un pack !
           </p>
           <button id="open-pack-btn">✨ Ouvrir un pack</button>
-          <div class="pack-results">
-            <div class="section-title" style="margin-top: 8px; margin-bottom:4px;font-size:1rem;">
-              Résultat du dernier pack
-            </div>
-            <div id="pack-cards" class="cards-grid"></div>
-          </div>
         </section>
       </div>
 
@@ -647,9 +1052,28 @@
             <div class="section-title">📚 Ma collection</div>
             <div class="pill" id="collection-summary"></div>
           </div>
-          <button id="reload-collection-btn" class="secondary" style="margin-bottom:8px;">
-            Recharger ma collection
-          </button>
+
+          <div class="toolbar" style="margin-bottom:8px;">
+            <button id="toggle-missing-btn" class="secondary">
+              Masquer cartes non possédées
+            </button>
+
+            <label class="pill">
+              Rareté / Numéro
+              <select id="collection-sort" style="margin-left:6px; background:transparent; border:none; color:inherit; font-size:0.8rem;">
+                <option value="none">Aucun tri / filtre</option>
+                <option value="rarity-asc">Rareté croissante</option>
+                <option value="rarity-desc">Rareté décroissante</option>
+                <option value="num-asc" selected>Numéro croissant</option>
+                <option value="num-desc">Numéro décroissant</option>
+                <option value="only-common">Seulement communes</option>
+                <option value="only-uncommon">Seulement peu communes</option>
+                <option value="only-rare">Seulement rares</option>
+                <option value="only-legendary">Seulement légendaires</option>
+              </select>
+            </label>
+          </div>
+
           <div id="collection-cards" class="cards-grid"></div>
           <p id="collection-empty-text" class="status"></p>
         </section>
@@ -722,6 +1146,14 @@
     </div>
   </div>
 
+  <!-- MODAL D'INSPECTION DE CARTE (vue collection) -->
+  <div id="card-modal" class="card-modal">
+    <div class="card-modal-content">
+      <button id="card-modal-close" class="card-modal-close">✕ Fermer</button>
+      <div id="card-modal-body" class="card-modal-inner"></div>
+    </div>
+  </div>
+
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -730,7 +1162,6 @@
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Seul ce pseudo voit / peut utiliser la création de cartes et l'onglet Admin
     const ADMIN_NAME = "William";
 
     const cardsContainer = document.getElementById("cards");
@@ -752,9 +1183,13 @@
     const collectionCardsContainer = document.getElementById("collection-cards");
     const collectionEmptyText = document.getElementById("collection-empty-text");
     const collectionSummary = document.getElementById("collection-summary");
-    const reloadCollectionBtn = document.getElementById("reload-collection-btn");
+    const collectionSort = document.getElementById("collection-sort");
+    const toggleMissingBtn = document.getElementById("toggle-missing-btn");
 
     const packOverlay = document.getElementById("pack-overlay");
+    const packOpening = document.getElementById("pack-opening");
+    const packCardsStage = document.getElementById("pack-cards-stage");
+    const packParticles = document.getElementById("pack-particles");
     const createSection = document.getElementById("create-section");
 
     const navButtons = document.querySelectorAll(".nav-btn");
@@ -765,11 +1200,18 @@
       admin: document.getElementById("view-admin")
     };
 
+    // Modal d'inspection (collection)
+    const cardModal = document.getElementById("card-modal");
+    const cardModalBody = document.getElementById("card-modal-body");
+    const cardModalClose = document.getElementById("card-modal-close");
+
     const PACK_COOLDOWN_HOURS = 3;
     const CARDS_PER_PACK = 3;
 
     let currentPlayer = null;
     let lastLoadedCards = [];
+    let showMissing = true; // par défaut on voit les cartes non possédées
+    let lastPackDrawn = null;
 
     const RARITY_LABELS = {
       common: "Commun",
@@ -778,8 +1220,15 @@
       legendary: "Légendaire"
     };
 
+    const RARITY_ORDER = {
+      common: 0,
+      uncommon: 1,
+      rare: 2,
+      legendary: 3
+    };
+
     function setStatus(message) {
-      statusEl.textContent = message || "";
+      if (statusEl) statusEl.textContent = message || "";
     }
 
     function showView(name) {
@@ -878,13 +1327,28 @@
       }
     }
 
-    function createCardElement(card, { quantity = null, allowDelete = false, onDelete = null } = {}) {
+    function createCardElement(
+      card,
+      {
+        quantity = null,
+        allowDelete = false,
+        onDelete = null,
+        hidden = false,
+        editableNumber = false,
+        onEditNumber = null
+      } = {}
+    ) {
       const div = document.createElement("div");
       div.className = "card";
 
-      const rarity = card.rarity || "common";
-      div.classList.add("rarity-" + rarity);
+      if (hidden) {
+        div.classList.add("hidden-card");
+      } else {
+        const rarity = card.rarity || "common";
+        div.classList.add("rarity-" + rarity);
+      }
 
+      // Badge quantité
       if (quantity && quantity > 1) {
         const q = document.createElement("div");
         q.className = "quantity-badge";
@@ -892,66 +1356,117 @@
         div.appendChild(q);
       }
 
+      // Image
       const imageDiv = document.createElement("div");
       imageDiv.className = "card-image";
 
-      if (card.image_url) {
-        const img = document.createElement("img");
-        img.src = card.image_url;
-        img.alt = card.name;
-        imageDiv.appendChild(img);
+      if (hidden) {
+        const span = document.createElement("span");
+        span.textContent = "???";
+        imageDiv.appendChild(span);
       } else {
-        imageDiv.textContent = "Pas d'image";
+        if (card.image_url) {
+          const img = document.createElement("img");
+          img.src = card.image_url;
+          img.alt = card.name;
+          imageDiv.appendChild(img);
+        } else {
+          imageDiv.textContent = "Pas d'image";
+        }
       }
 
+      // Nom + badge
       const nameRow = document.createElement("div");
       nameRow.className = "card-name-row";
 
       const nameEl = document.createElement("div");
       nameEl.className = "card-name";
-      nameEl.textContent = card.name;
 
-      const badge = document.createElement("span");
-      badge.className = "badge";
-      badge.textContent = RARITY_LABELS[rarity] || "Commun";
-      badge.classList.add("rarity-" + rarity);
+      if (hidden) {
+        nameEl.textContent =
+          card.collection_number != null
+            ? "#" + card.collection_number + " ???"
+            : "???";
+      } else {
+        let label = card.name || "Sans nom";
+        if (card.collection_number != null) {
+          label = "#" + card.collection_number + " " + label;
+        }
+        nameEl.textContent = label;
+
+        const rarity = card.rarity || "common";
+        const badge = document.createElement("span");
+        badge.className = "badge rarity-" + rarity;
+        badge.textContent = RARITY_LABELS[rarity] || "Commun";
+        nameRow.appendChild(badge);
+      }
 
       nameRow.appendChild(nameEl);
-      nameRow.appendChild(badge);
 
+      // Description
       const desc = document.createElement("div");
       desc.className = "card-desc";
-      desc.textContent = card.description || "Aucune description.";
+      desc.textContent = hidden
+        ? "Carte non découverte pour l'instant."
+        : (card.description || "Aucune description.");
 
+      // Owner
       const owner = document.createElement("div");
       owner.className = "card-owner";
-      owner.textContent = card.owner_name
-        ? `Créée par : ${card.owner_name}`
-        : "Créateur : (inconnu)";
+      owner.textContent = hidden
+        ? "Découvre cette carte en ouvrant des packs 🎁"
+        : (card.owner_name
+            ? `Créée par : ${card.owner_name}`
+            : "Créateur : (inconnu)");
 
+      // Stats
       const statsRow = document.createElement("div");
       statsRow.className = "card-stats-row";
 
-      const stats = document.createElement("div");
-      stats.className = "card-stats";
-      const atk = document.createElement("span");
-      atk.className = "pill-stat";
-      atk.textContent = "ATK " + (card.attack ?? 0);
-      const def = document.createElement("span");
-      def.className = "pill-stat";
-      def.textContent = "DEF " + (card.defense ?? 0);
-      stats.appendChild(atk);
-      stats.appendChild(def);
+      if (!hidden) {
+        const stats = document.createElement("div");
+        stats.className = "card-stats";
 
-      statsRow.appendChild(stats);
+        const atk = document.createElement("span");
+        atk.className = "pill-stat";
+        atk.textContent = "ATK " + (card.attack ?? 0);
 
-      if (allowDelete && typeof onDelete === "function") {
+        const def = document.createElement("span");
+        def.className = "pill-stat";
+        def.textContent = "DEF " + (card.defense ?? 0);
+
+        stats.appendChild(atk);
+        stats.appendChild(def);
+        statsRow.appendChild(stats);
+      }
+
+      // Suppression admin
+      if (!hidden && allowDelete && typeof onDelete === "function") {
         const delBtn = document.createElement("button");
         delBtn.type = "button";
         delBtn.className = "delete-btn";
         delBtn.innerHTML = "🗑 Supprimer";
-        delBtn.addEventListener("click", () => onDelete(card));
+        delBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          onDelete(card);
+        });
         statsRow.appendChild(delBtn);
+      }
+
+      // Edition numéro
+      if (!hidden && editableNumber && typeof onEditNumber === "function") {
+        const numBtn = document.createElement("button");
+        numBtn.type = "button";
+        numBtn.className = "secondary btn-small";
+        numBtn.textContent =
+          card.collection_number != null
+            ? "#" + card.collection_number
+            : "Numéro ?";
+        numBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          onEditNumber(card);
+        });
+        statsRow.appendChild(numBtn);
       }
 
       div.appendChild(imageDiv);
@@ -959,31 +1474,71 @@
       div.appendChild(desc);
       div.appendChild(owner);
       div.appendChild(statsRow);
+
       return div;
     }
 
+    // Carte spéciale pour l'overlay d'ouverture de pack : dos (???) puis face
+    function createPackCardElement(card) {
+      const rarity = card.rarity || "common";
+      const wrapper = document.createElement("div");
+      wrapper.className = "pack-card-wrapper rarity-" + rarity;
+
+      const inner = document.createElement("div");
+      inner.className = "pack-card-inner";
+
+      const backFace = document.createElement("div");
+      backFace.className = "pack-card-face pack-card-back";
+      const backCard = createCardElement(card, { hidden: true });
+      backCard.classList.add("card-pack");
+      backFace.appendChild(backCard);
+
+      const frontFace = document.createElement("div");
+      frontFace.className = "pack-card-face pack-card-front";
+      const frontCard = createCardElement(card);
+      frontCard.classList.add("card-pack");
+      frontFace.appendChild(frontCard);
+
+      inner.appendChild(backFace);
+      inner.appendChild(frontFace);
+      wrapper.appendChild(inner);
+
+      // Clique sur la carte => elle se retourne et le contour animé s'active
+      wrapper.addEventListener("click", (e) => {
+        e.stopPropagation();
+        wrapper.classList.add("revealed");
+      });
+
+      return wrapper;
+    }
+
     function renderCards() {
+      if (!cardsContainer) return;
       cardsContainer.innerHTML = "";
       let cardsToShow = lastLoadedCards;
       if (filterMineCheckbox && filterMineCheckbox.checked && currentPlayer) {
         cardsToShow = cardsToShow.filter(c => c.owner_name === currentPlayer);
       }
       if (!cardsToShow.length) {
-        setStatus("Aucune carte à afficher (essaye d'en ajouter ou de décocher le filtre).");
+        setStatus("Aucune carte à afficher (ajoute-en ou décocher le filtre).");
         return;
       }
       setStatus(`Cartes affichées : ${cardsToShow.length}`);
       cardsToShow.forEach(card => {
         const canDelete = currentPlayer === ADMIN_NAME;
+        const canEditNumber = currentPlayer === ADMIN_NAME;
         const el = createCardElement(card, {
           allowDelete: canDelete,
-          onDelete: handleDeleteCard
+          onDelete: handleDeleteCard,
+          editableNumber: canEditNumber,
+          onEditNumber: handleEditCardNumber
         });
         cardsContainer.appendChild(el);
       });
     }
 
     async function loadCards() {
+      if (!cardsContainer) return;
       setStatus("Chargement...");
       cardsContainer.innerHTML = "";
       try {
@@ -1099,7 +1654,6 @@
       }
     }
 
-    // Suppression admin-only : collection + carte
     async function handleDeleteCard(card) {
       if (!currentPlayer || currentPlayer !== ADMIN_NAME) {
         alert("Seul William peut supprimer des cartes.");
@@ -1137,6 +1691,55 @@
       } catch (e) {
         console.error(e);
         alert("Erreur inconnue lors de la suppression.");
+      }
+    }
+
+    async function handleEditCardNumber(card) {
+      if (!currentPlayer || currentPlayer !== ADMIN_NAME) {
+        alert("Seul William peut modifier les numéros de collection.");
+        return;
+      }
+
+      const current = card.collection_number ?? "";
+      const input = prompt(
+        `Numéro de collection pour "${card.name}" :`,
+        current === null ? "" : String(current)
+      );
+      if (input === null) return;
+
+      const trimmed = input.trim();
+      let value = null;
+
+      if (trimmed !== "") {
+        value = Number(trimmed);
+        if (!Number.isInteger(value)) {
+          alert("Merci d'entrer un numéro entier (ou laisse vide pour effacer).");
+          return;
+        }
+      }
+
+      try {
+        const { error } = await supabase
+          .from("cards")
+          .update({ collection_number: value })
+          .eq("id", card.id);
+
+        if (error) {
+          console.error(error);
+          alert("Erreur lors de la mise à jour du numéro : " + error.message);
+          return;
+        }
+
+        const idx = lastLoadedCards.findIndex(c => c.id === card.id);
+        if (idx !== -1) {
+          lastLoadedCards[idx].collection_number = value;
+        }
+
+        renderCards();
+        await loadCollection();
+      } catch (e) {
+        console.error(e);
+        alert("Erreur inconnue lors de la mise à jour du numéro.");
       }
     }
 
@@ -1195,11 +1798,76 @@
       return pool[Math.floor(Math.random() * pool.length)];
     }
 
-    function showPackOverlay() {
-      packOverlay.classList.add("visible");
+    // Particules lors de l'ouverture du pack
+    function spawnPackParticles() {
+      if (!packParticles) return;
+      packParticles.innerHTML = "";
+      const count = 24;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement("div");
+        p.className = "pack-particle";
+
+        const x = Math.random() * 100;
+        const delay = Math.random() * 0.25;
+
+        p.style.left = x + "%";
+        p.style.bottom = (Math.random() * 20) + "%";
+        p.style.animationDelay = delay + "s";
+
+        packParticles.appendChild(p);
+      }
     }
+
+    // Gestion de l'overlay d'ouverture de pack
+    function showPackOpening() {
+      if (!packOverlay) return;
+      packOverlay.classList.add("visible");
+      if (packOpening) packOpening.style.display = "flex";
+      if (packCardsStage) packCardsStage.style.display = "none";
+    }
+
+    function showPackCardsOverlay(drawn) {
+      if (!packOverlay) return;
+      packOverlay.classList.add("visible");
+      if (packOpening) packOpening.style.display = "none";
+      if (packCardsStage) packCardsStage.style.display = "flex";
+
+      if (!packCardsContainer) return;
+      packCardsContainer.innerHTML = "";
+      drawn.forEach(card => {
+        const wrapper = createPackCardElement(card);
+        packCardsContainer.appendChild(wrapper);
+      });
+    }
+
     function hidePackOverlay() {
+      if (!packOverlay) return;
       packOverlay.classList.remove("visible");
+      if (packOpening) packOpening.style.display = "flex";
+      if (packCardsStage) packCardsStage.style.display = "none";
+      if (packCardsContainer) packCardsContainer.innerHTML = "";
+      openPackBtn.disabled = false;
+    }
+
+    function startPackOpenAnimation() {
+      if (!packOpening) return;
+
+      packOpening.classList.add("opening");
+      spawnPackParticles();
+
+      const drawn = lastPackDrawn || [];
+
+      setTimeout(() => {
+        packOpening.classList.remove("opening");
+
+        if (!drawn.length) {
+          hidePackOverlay();
+          openPackBtn.disabled = false;
+          return;
+        }
+
+        showPackCardsOverlay(drawn);
+      }, 400);
     }
 
     async function handleOpenPack() {
@@ -1222,49 +1890,76 @@
         return;
       }
 
-      showPackOverlay();
+      // 1) Tirage des cartes DU pack
+      const drawn = [];
+      for (let i = 0; i < CARDS_PER_PACK; i++) {
+        drawn.push(pickRandomCardWeighted(lastLoadedCards));
+      }
+      lastPackDrawn = drawn;
+
+      // 2) Enregistrement dans la collection
+      try {
+        const rows = drawn.map(c => ({
+          owner_name: currentPlayer,
+          card_id: c.id
+        }));
+
+        const { error } = await supabase
+          .from("card_collection")
+          .insert(rows);
+
+        if (error) {
+          console.error(error);
+          alert("Les cartes ont été tirées, mais erreur lors de l'enregistrement de la collection.");
+        } else {
+          await loadCollection();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      // 3) Cooldown + timer
+      setNextPackTime(PACK_COOLDOWN_HOURS);
+      updatePackTimer();
+
+      // 4) On affiche le pack fermé dans l'overlay
       openPackBtn.disabled = true;
-
-      setTimeout(async () => {
-        const drawn = [];
-        for (let i = 0; i < CARDS_PER_PACK; i++) {
-          drawn.push(pickRandomCardWeighted(lastLoadedCards));
-        }
-
-        packCardsContainer.innerHTML = "";
-        drawn.forEach(card => {
-          const el = createCardElement(card);
-          el.classList.add("card-reveal");
-          packCardsContainer.appendChild(el);
-        });
-
-        try {
-          const rows = drawn.map(c => ({
-            owner_name: currentPlayer,
-            card_id: c.id
-          }));
-
-          const { error } = await supabase
-            .from("card_collection")
-            .insert(rows);
-
-          if (error) {
-            console.error(error);
-            alert("Les cartes ont été tirées, mais erreur lors de l'enregistrement de la collection.");
-          } else {
-            await loadCollection();
-          }
-        } catch (e) {
-          console.error(e);
-        }
-
-        setNextPackTime(PACK_COOLDOWN_HOURS);
-        updatePackTimer();
-        hidePackOverlay();
-        openPackBtn.disabled = false;
-      }, 1100);
+      showPackOpening();
     }
 
+    // --- Modal d'inspection (vue collection) ---
+    function openCardModal(card, quantity) {
+      if (!cardModal || !cardModalBody) return;
+      cardModalBody.innerHTML = "";
+
+      const bigCard = createCardElement(card, {
+        quantity: quantity && quantity > 1 ? quantity : null
+      });
+      cardModalBody.appendChild(bigCard);
+
+      cardModal.classList.add("visible");
+    }
+
+    function closeCardModal() {
+      if (!cardModal) return;
+      cardModal.classList.remove("visible");
+    }
+
+    if (cardModalClose) {
+      cardModalClose.addEventListener("click", () => {
+        closeCardModal();
+      });
+    }
+
+    if (cardModal) {
+      cardModal.addEventListener("click", (e) => {
+        if (e.target === cardModal) {
+          closeCardModal();
+        }
+      });
+    }
+
+    // Collection
     async function loadCollection() {
       collectionCardsContainer.innerHTML = "";
       collectionEmptyText.textContent = "";
@@ -1287,13 +1982,8 @@
           return;
         }
 
-        if (!data || data.length === 0) {
-          collectionEmptyText.textContent = "Tu n'as encore aucune carte dans ta collection. Ouvre un pack pour commencer 🎁";
-          return;
-        }
-
         const counts = {};
-        data.forEach(row => {
+        (data || []).forEach(row => {
           counts[row.card_id] = (counts[row.card_id] || 0) + 1;
         });
 
@@ -1301,19 +1991,124 @@
           await loadCards();
         }
 
-        let totalCopies = 0;
-        let distinctCards = 0;
+        if (!lastLoadedCards || lastLoadedCards.length === 0) {
+          collectionEmptyText.textContent = "Il n'y a aucune carte dans le jeu pour l'instant.";
+          return;
+        }
 
-        Object.entries(counts).forEach(([cardId, qty]) => {
-          const card = lastLoadedCards.find(c => c.id === cardId);
-          if (!card) return;
-          distinctCards += 1;
+        const sortValue = collectionSort ? collectionSort.value : "none";
+
+        let rarityFilter = null;
+        let sortMode = sortValue;
+
+        if (sortValue === "only-common") {
+          rarityFilter = "common";
+          sortMode = "none";
+        } else if (sortValue === "only-uncommon") {
+          rarityFilter = "uncommon";
+          sortMode = "none";
+        } else if (sortValue === "only-rare") {
+          rarityFilter = "rare";
+          sortMode = "none";
+        } else if (sortValue === "only-legendary") {
+          rarityFilter = "legendary";
+          sortMode = "none";
+        }
+
+        let baseCards = lastLoadedCards.slice();
+
+        if (rarityFilter) {
+          baseCards = baseCards.filter(
+            c => (c.rarity || "common") === rarityFilter
+          );
+        }
+
+        let entries;
+
+        if (showMissing) {
+          entries = baseCards.map(card => ({
+            card,
+            qty: counts[card.id] || 0
+          }));
+        } else {
+          entries = baseCards
+            .map(card => {
+              const qty = counts[card.id] || 0;
+              if (!qty) return null;
+              return { card, qty };
+            })
+            .filter(Boolean);
+        }
+
+        if (sortMode === "rarity-asc") {
+          entries.sort((a, b) => {
+            const ra = RARITY_ORDER[a.card.rarity || "common"] ?? 0;
+            const rb = RARITY_ORDER[b.card.rarity || "common"] ?? 0;
+            return ra - rb;
+          });
+        } else if (sortMode === "rarity-desc") {
+          entries.sort((a, b) => {
+            const ra = RARITY_ORDER[a.card.rarity || "common"] ?? 0;
+            const rb = RARITY_ORDER[b.card.rarity || "common"] ?? 0;
+            return rb - ra;
+          });
+        } else if (sortMode === "num-asc") {
+          entries.sort((a, b) => {
+            const na = a.card.collection_number ?? Number.POSITIVE_INFINITY;
+            const nb = b.card.collection_number ?? Number.POSITIVE_INFINITY;
+            return na - nb;
+          });
+        } else if (sortMode === "num-desc") {
+          entries.sort((a, b) => {
+            const na = a.card.collection_number ?? -1;
+            const nb = b.card.collection_number ?? -1;
+            return nb - na;
+          });
+        }
+
+        if (!entries.length) {
+          if (showMissing) {
+            collectionEmptyText.textContent = "Aucune carte pour ce filtre (bizarre, vérifie tes données).";
+          } else if (rarityFilter) {
+            collectionEmptyText.textContent = "Aucune carte ne correspond à ce filtre de rareté.";
+          } else {
+            collectionEmptyText.textContent = "Tu n'as encore aucune carte dans ta collection. Ouvre un pack pour commencer 🎁";
+          }
+          return;
+        }
+
+        let distinctOwned = 0;
+        let totalCopies = 0;
+
+        entries.forEach(({ card, qty }) => {
+          if (qty > 0) distinctOwned += 1;
           totalCopies += qty;
-          const el = createCardElement(card, { quantity: qty });
+
+          const isHidden = showMissing && qty === 0;
+
+          const el = createCardElement(card, {
+            quantity: qty > 1 ? qty : null,
+            hidden: isHidden
+          });
+
+          if (!isHidden) {
+            el.addEventListener("click", () => {
+              openCardModal(card, qty);
+            });
+          }
+
           collectionCardsContainer.appendChild(el);
         });
 
-        collectionSummary.textContent = `${distinctCards} cartes différentes – ${totalCopies} exemplaires au total`;
+        const totalDistinct = showMissing ? baseCards.length : distinctOwned;
+
+        if (showMissing) {
+          collectionSummary.textContent =
+            `${distinctOwned}/${totalDistinct} cartes découvertes – ${totalCopies} exemplaires au total`;
+        } else {
+          collectionSummary.textContent =
+            `${distinctOwned} cartes différentes – ${totalCopies} exemplaires au total`;
+        }
       } catch (e) {
         console.error(e);
         collectionEmptyText.textContent = "Erreur inconnue lors du chargement de la collection.";
@@ -1365,7 +2160,41 @@
     if (reloadBtn) reloadBtn.addEventListener("click", loadCards);
     if (form) form.addEventListener("submit", handleAddCard);
     openPackBtn.addEventListener("click", handleOpenPack);
-    reloadCollectionBtn.addEventListener("click", loadCollection);
+
+    if (packOpening) {
+      packOpening.addEventListener("click", (e) => {
+        e.stopPropagation();
+        startPackOpenAnimation();
+      });
+    }
+
+    if (collectionSort) {
+      collectionSort.addEventListener("change", loadCollection);
+    }
+
+    if (toggleMissingBtn) {
+      toggleMissingBtn.addEventListener("click", () => {
+        showMissing = !showMissing;
+        toggleMissingBtn.textContent = showMissing
+          ? "Masquer cartes non possédées"
+          : "Voir cartes non possédées";
+        loadCollection();
+      });
+    }
+
+    // Cliquer à côté des cartes du pack pour fermer l'overlay
+    if (packOverlay) {
+      packOverlay.addEventListener("click", (e) => {
+        // On ne ferme que si on est à l'étape où les cartes sont visibles
+        if (!packCardsStage || packCardsStage.style.display !== "flex") return;
+
+        // Si le clic n'est pas sur une carte ni à l'intérieur d'une carte, on ferme
+        const clickedOnCard = e.target.closest(".pack-card-wrapper");
+        if (!clickedOnCard) {
+          hidePackOverlay();
+        }
+      });
+    }
 
     setInterval(updatePackTimer, 1000);
 
